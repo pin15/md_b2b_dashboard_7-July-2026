@@ -1,0 +1,39 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Clean-slate quality gates (md-admin disables these at build — we do NOT).
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    env:
+      # Mock mode so the build needs no live Supabase / GraphQL backend.
+      NEXT_PUBLIC_USE_MOCK: "true"
+      NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co"
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "anon-placeholder-not-a-secret"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Typecheck (strict)
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Build
+        run: npm run build
+      - name: Privacy guard — no service-role / secret / direct-DB in client
+        # Fails the build if a forbidden pattern is reachable from src/. The
+        # GraphQL-only + Auth-only-Supabase invariants are enforced here too.
+        run: |
+          set -e
+          # Match real violations (actual calls / secret names), not prose that
+          # merely describes the prohibition in a comment.
+          ! grep -rnE "SERVICE_ROLE|SUPABASE_SERVICE|supabase\.from\(|supabase\.rpc\(|createClient\(" src/ \
+            || (echo "::error::forbidden Supabase data/service-role pattern in client" && exit 1)
+          echo "privacy guard passed"

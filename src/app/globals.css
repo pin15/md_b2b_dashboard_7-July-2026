@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens — doc 10 §2.1. TWO DISTINCT PALETTES, never mixed:
+ *  (a) brand/chrome  — theme the shell; per-org overridable via org_branding.
+ *  (b) data-severity — FIXED, brand-independent. An org's brand colour must
+ *      never recolour a severity band.
+ *
+ * SEVERITY-COLOUR RULE (LOCKED, doc 10 §2.1):
+ *  - continuous gradients (OWI ramp, heatmaps, distributions): green→amber→CORAL,
+ *    NEVER red.
+ *  - red (#E84D3D) ONLY on discrete employer/HR threshold alerts (KPI crossing a
+ *    cutpoint), never on a gradient, never on any employee-facing surface.
+ */
+:root {
+  /* (a) brand / chrome — B2C navy accent + slate neutrals, applied globally.
+   * Aligned to the B2C design system (#1E3A5F navy + Tailwind slate scale) so the
+   * shell, cards, and typography read identically across the B2C and B2B apps. */
+  --brand-primary: #1e3a5f; /* active tab/nav, primary buttons, focus — B2C navy */
+  --brand-primary-hover: #162d4a;
+  --brand-accent: #1e3a5f;
+  --brand-lockup: #e84d3d; /* MoodScale brand red — logo/title lockup ONLY (identity, not data) */
+  --brand-bg: #d8e0e9; /* darker base still (was slate-50 #f8fafc) — gradient layered on top of this */
+  --brand-surface: #ffffff;
+  --brand-text: #0f172a; /* slate-900 */
+  --brand-muted: #475569; /* slate-600 */
+  --brand-border: #e2e8f0; /* slate-200 */
+
+  /* (b) data-semantic / severity — fixed, do NOT theme per org.
+   * Deep, desaturated tones (forest / bronze / terracotta) so severity reads as
+   * considered data colour against the slate-and-navy chrome — the bright stock
+   * greens/ambers read as pastel noise on the elegant surface. Semantics are
+   * unchanged: green→amber→coral calm ramp, red discrete alerts only. All four
+   * hold ≥4.5:1 contrast on white, so they remain legal as small text. */
+  --severity-green: #15803d; /* healthy / positive — forest */
+  --severity-amber: #b45309; /* borderline / caution — bronze */
+  --severity-coral: #c0564a; /* serious — calm ramp top, terracotta, NOT red */
+  --severity-red: #b91c1c; /* discrete employer alert ONLY — deep alarm */
+  --severity-suppressed: #f1f5f9; /* neutral slate — "below reporting threshold" */
+  --severity-suppressed-text: #64748b;
+
+  /* (c) elevation — boxes are defined by SHADOW, never a border or accent bar
+   * (DESIGN-SYSTEM.md §3). Two-layer soft shadow lifts white cards off the slate
+   * canvas as "raised paper"; the hover variant adds a touch more depth. */
+  --elevation-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px -12px rgba(16, 24, 40, 0.1);
+  --elevation-card-hover: 0 1px 2px rgba(16, 24, 40, 0.05), 0 12px 28px -10px rgba(16, 24, 40, 0.14);
+}
+
+@theme inline {
+  /* Inter as the default sans (B2C parity). Falls back to system fonts before load. */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-lockup: var(--brand-lockup);
+  --color-brand-bg: var(--brand-bg);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-text: var(--brand-text);
+  --color-brand-muted: var(--brand-muted);
+  --color-brand-border: var(--brand-border);
+
+  --color-severity-green: var(--severity-green);
+  --color-severity-amber: var(--severity-amber);
+  --color-severity-coral: var(--severity-coral);
+  --color-severity-red: var(--severity-red);
+  --color-severity-suppressed: var(--severity-suppressed);
+
+  /* Elevation tokens → `shadow-card` / `shadow-card-hover` utilities. */
+  --shadow-card: var(--elevation-card);
+  --shadow-card-hover: var(--elevation-card-hover);
+}
+
+html,
+body {
+  /* B2C page gradient (doc §1d) layered over the slate-50 base so scrolling never
+   * exposes a flat canvas. White cards read as raised against the subtle sky tint. */
+  background: var(--brand-bg)
+    linear-gradient(
+      135deg,
+      #e3e9f0 0%,
+      #d8e0e9 25%,
+      #cbd9e6 50%,
+      #d8e0e9 75%,
+      #e3e9f0 100%
+    )
+    fixed;
+  color: var(--brand-text);
+}
+
+body {
+  /* B2C type rendering: ligatures + contextual alternates, antialiased. */
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+* {
+  border-color: var(--brand-border);
+}
+
+/* QBR / Org Health Report — print only the report card, hide app chrome. */
+@media print {
+  .no-print { display: none !important; }
+  body * { visibility: hidden; }
+  #qbr-report, #qbr-report * { visibility: visible; }
+  #qbr-report { position: absolute; left: 0; top: 0; width: 100%; border: 0 !important; }
+}
