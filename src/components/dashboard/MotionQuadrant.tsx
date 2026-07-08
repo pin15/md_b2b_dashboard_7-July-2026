@@ -62,7 +62,7 @@ export function MotionQuadrant({ period }: { period: string }) {
       </div>
 
       {isLoading ? (
-        <div className="h-[320px] w-full animate-pulse rounded-xl bg-brand-border/40" />
+        <div className="skeleton h-[320px] w-full rounded-xl" aria-hidden="true" />
       ) : isError ? (
         <p className="text-sm text-brand-muted">The quadrant is unavailable right now.</p>
       ) : points.length === 0 ? (

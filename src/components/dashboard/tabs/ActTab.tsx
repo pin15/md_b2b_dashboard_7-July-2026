@@ -1036,7 +1036,7 @@ function IncidentRow({
 
 function IncidentUptake({ incidentId }: { incidentId: string }) {
   const { data, isLoading } = useOrgIncidentUptake(incidentId);
-  if (isLoading) return <div className="mt-3 h-12 animate-pulse rounded-lg bg-slate-100" />;
+  if (isLoading) return <div className="mt-3 h-12 skeleton rounded-lg" />;
   if (!data || data.status !== "computed") {
     return (
       <p className="mt-3 text-[11.5px] text-slate-400">

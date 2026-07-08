@@ -565,7 +565,7 @@ function ByLevelCell({ data }: { data: ByLevelOwi[] }) {
 function NorthStarCell({ period }: { period: string }) {
   const q = useEngagedCoveredLives(period);
   const data = q.data;
-  if (q.isLoading) return <div className="h-24 animate-pulse rounded-lg bg-slate-100" />;
+  if (q.isLoading) return <div className="h-24 skeleton rounded-lg" />;
   if (q.isError)
     return (
       <p className="text-[13px]" style={{ color: SEVERITY.red }}>
@@ -620,7 +620,7 @@ function CareEngagedCell({
     | undefined;
   loading: boolean;
 }) {
-  if (loading) return <div className="h-24 animate-pulse rounded-lg bg-slate-100" />;
+  if (loading) return <div className="h-24 skeleton rounded-lg" />;
   const live = care?.status === "live";
   return (
     <div className="flex h-full flex-col gap-1.5">
@@ -667,7 +667,7 @@ function ExecPsafetyCell({
   psafety: ExecTeamPsafety | undefined;
   loading: boolean;
 }) {
-  if (loading || !psafety) return <div className="h-24 animate-pulse rounded-lg bg-slate-100" />;
+  if (loading || !psafety) return <div className="h-24 skeleton rounded-lg" />;
   const live = psafety.status === "live";
   return (
     <div className="flex h-full flex-col gap-1.5">
@@ -833,7 +833,7 @@ function TrendsCell() {
   const trust = useMetricTrend("TRUST_QUOTIENT");
 
   if (part.isLoading || valid.isLoading || trust.isLoading)
-    return <div className="h-64 animate-pulse rounded-lg bg-slate-100" />;
+    return <div className="h-64 skeleton rounded-lg" />;
   if (part.isError || valid.isError || trust.isError)
     return (
       <p className="text-[13px]" style={{ color: SEVERITY.red }}>
@@ -942,7 +942,7 @@ function QuadrantCell({ period }: { period: string }) {
         <span className="text-[11.5px] text-slate-400">by department · k≥5</span>
       </div>
       {isLoading ? (
-        <div className="h-60 animate-pulse rounded-lg bg-slate-100" />
+        <div className="h-60 skeleton rounded-lg" />
       ) : isError ? (
         <p className="text-[13px] text-slate-400">The quadrant is unavailable right now.</p>
       ) : points.length === 0 ? (
@@ -1048,7 +1048,7 @@ function BurnoutJourneyStrip() {
       <div className="flex flex-col gap-1.5">
         <MicroLabel>Burnout journey · BRI</MicroLabel>
         {trend.isLoading ? (
-          <div className="h-10 w-32 animate-pulse rounded-lg bg-slate-100" />
+          <div className="h-10 w-32 skeleton rounded-lg" />
         ) : !latest ? (
           <p className="text-[13px] leading-relaxed text-slate-400">
             Pending — BRI appears once the metric is published and a quarter clears the reporting

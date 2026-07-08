@@ -123,7 +123,7 @@ function Metric({ config }: { config: MetricConfig }) {
 function LoadingState() {
   return (
     <div
-      className="h-[96px] w-full animate-pulse rounded-xl bg-brand-surface shadow-card"
+      className="skeleton h-[96px] w-full rounded-xl shadow-card"
       aria-hidden
     />
   );

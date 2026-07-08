@@ -124,9 +124,9 @@ export function BandDot({ color, label }: { color: string | undefined; label: st
 }
 
 export function CellSkeleton() {
-  return <div className="h-24 animate-pulse rounded-lg bg-slate-100" />;
+  return <div className="skeleton h-24 rounded-lg" aria-hidden="true" />;
 }
 
 export function PanelSkeleton({ className }: { className?: string }) {
-  return <div className={cn("h-40 animate-pulse rounded-2xl bg-slate-100", className)} />;
+  return <div className={cn("skeleton h-40 rounded-2xl", className)} aria-hidden="true" />;
 }

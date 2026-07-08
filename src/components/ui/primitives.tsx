@@ -160,7 +160,10 @@ export function StatusDot({
 
 export function Skeleton({ className }: { className?: string }) {
   return (
-    <div className={cn("animate-pulse rounded-md bg-brand-border/60", className)} />
+    <div
+      className={cn("skeleton rounded-md", className)}
+      aria-hidden="true"
+    />
   );
 }
 
