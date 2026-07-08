@@ -342,7 +342,7 @@ function OwiHero({ value, pendingNote }: { value: number | null; pendingNote: st
         {pending ? (
           <span className="text-[12px] text-slate-500">pending — {pendingNote}</span>
         ) : (
-          <BandDot color={color} label={OWI_BAND_LABEL[owiBand(value)]} />
+          <BandDot color={color} label={OWI_BAND_LABEL[owiBand(value)] ?? ""} />
         )}
       </div>
       <div className="mt-auto pt-1">

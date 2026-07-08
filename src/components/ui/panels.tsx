@@ -114,7 +114,7 @@ export function SuppressedNote({ k, children }: { k?: number | null; children?: 
 }
 
 /** A small dot + label in a semantic tone — the only sanctioned colored chrome. */
-export function BandDot({ color, label }: { color: string; label: string }) {
+export function BandDot({ color, label }: { color: string | undefined; label: string }) {
   return (
     <span className="inline-flex items-center gap-1.5 text-[11.5px] font-medium" style={{ color }}>
       <span aria-hidden className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
