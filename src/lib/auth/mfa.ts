@@ -14,10 +14,21 @@ type AalData = AuthMFAGetAuthenticatorAssuranceLevelResponse["data"];
 export const MFA_PAGE = "/mfa";
 export const LOGIN_PAGE = "/login";
 
+/**
+ * TEMPORARY escape hatch: NEXT_PUBLIC_DISABLE_MFA=true turns off the mandatory-MFA
+ * gate on the client + middleware (demo convenience). Default-off — unset the env
+ * var and rebuild to restore mandatory MFA. Must be paired with DISABLE_MFA on the
+ * API (apps/api), which is the real wall.
+ */
+export function mfaDisabled(): boolean {
+  return process.env.NEXT_PUBLIC_DISABLE_MFA === "true";
+}
+
 /** AAL1→AAL2 trigger: the user has a verified factor but hasn't passed it yet. */
 export function needsMfaVerification(
   aal: AalData | null | undefined,
 ): boolean {
+  if (mfaDisabled()) return false;
   if (!aal) return false;
   return aal.currentLevel === "aal1" && aal.nextLevel === "aal2";
 }

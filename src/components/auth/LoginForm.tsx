@@ -8,7 +8,7 @@ import { supabase } from "@/lib/supabase/client";
 import { Card, Button } from "@/components/ui/primitives";
 import { HAS_SUPABASE } from "@/lib/env";
 import { hasEmployerAccess } from "@/lib/auth/claims";
-import { isAal2, buildMfaRedirectUrl } from "@/lib/auth/mfa";
+import { isAal2, buildMfaRedirectUrl, mfaDisabled } from "@/lib/auth/mfa";
 import { safeRedirectPath } from "@/lib/utils";
 
 export function LoginForm() {
@@ -66,9 +66,10 @@ export function LoginForm() {
       }
 
       // Mandatory MFA: AAL2 or go enroll/verify a TOTP factor.
+      // (Skipped when NEXT_PUBLIC_DISABLE_MFA=true — temporary demo escape hatch.)
       const { data: aal } =
         await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-      if (isAal2(aal)) {
+      if (mfaDisabled() || isAal2(aal)) {
         router.replace(redirectPath);
         return;
       }
