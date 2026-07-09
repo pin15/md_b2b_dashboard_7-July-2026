@@ -31,6 +31,15 @@ import { TopbarFilters } from "@/components/dashboard/TopbarFilters";
 import { supabase } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { LOGIN_PAGE } from "@/lib/auth/mfa";
+import { useCapabilities } from "@/lib/hooks/useCapabilities";
+
+// Standalone sidebar surfaces → the capability that gates them (guide/onboarding
+// are always shown). A surface hides when its capability is disabled for the org.
+const SURFACE_CAP: Record<string, string> = {
+  "/report": "module:report",
+  "/participation": "module:participation",
+  "/evidence": "module:proof",
+};
 
 // The dashboard's seven sections — now the top group of the rail (replacing the
 // in-body horizontal tab bar). Each links to /dashboard?tab=<id>; active state is
@@ -129,11 +138,12 @@ function RailLink({
 function RailTabs() {
   const pathname = usePathname();
   const params = useSearchParams();
+  const { has } = useCapabilities();
   const onDash = pathname === "/dashboard";
   const currentTab = params.get("tab") ?? "overview";
   return (
     <>
-      {DASH_TABS.map(({ tab, label, icon }) => (
+      {DASH_TABS.filter(({ tab }) => has(`tab:${tab}`)).map(({ tab, label, icon }) => (
         <RailLink
           key={tab}
           href={`/dashboard?tab=${tab}`}
@@ -150,6 +160,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const branding = useOrgBranding();
+  const { has } = useCapabilities();
 
   // The dashboard filters live in the app bar on wide screens; the body keeps a
   // fallback FilterBar below `xl` (DashboardView). Filters are dashboard-only.
@@ -200,7 +211,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {/* Divider between the dashboard tabs and the other surfaces. */}
           <div className="my-2 h-px w-7 shrink-0 bg-white/12" />
 
-          {SURFACES.map(({ href, label, icon }) => (
+          {SURFACES.filter(({ href }) => !SURFACE_CAP[href] || has(SURFACE_CAP[href])).map(({ href, label, icon }) => (
             <RailLink
               key={href}
               href={href}

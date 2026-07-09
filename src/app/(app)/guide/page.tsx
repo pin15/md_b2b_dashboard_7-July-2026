@@ -10,6 +10,7 @@ import {
   BandDot,
 } from "@/components/ui/panels";
 import { SEVERITY } from "@/lib/severity";
+import { useCapabilities } from "@/lib/hooks/useCapabilities";
 
 /**
  * "How it works" — an in-product explainer for employer users, set in the
@@ -20,6 +21,9 @@ import { SEVERITY } from "@/lib/severity";
  * items (metrics, questions) read as ledgers, not card grids.
  */
 export default function GuidePage() {
+  const { has } = useCapabilities();
+  const tier2 = TIER2_GROUPS.filter((g) => has(g.cap));
+  const screens = TABS.filter((t) => !t.c || has(t.c));
   return (
     <div className="space-y-8 pb-16">
       <header className="px-1 pt-1">
@@ -210,13 +214,14 @@ export default function GuidePage() {
       </section>
 
       {/* ── Deeper-tab metrics ────────────────────────────────────────────── */}
+      {tier2.length > 0 && (
       <section className="space-y-3">
         <SectionHeader
           title="Deeper-tab metrics &amp; concepts"
-          meta={`${TIER2_GROUPS.reduce((n, g) => n + g.items.length, 0)} more`}
+          meta={`${tier2.reduce((n, g) => n + g.items.length, 0)} more`}
         />
         <Panel className="overflow-hidden pb-1">
-          {TIER2_GROUPS.map((grp, gi) => (
+          {tier2.map((grp, gi) => (
             <div key={grp.label} className={cn(gi > 0 && "border-t border-slate-100")}>
               <div className="px-6 pt-3.5">
                 <MicroLabel>{grp.label}</MicroLabel>
@@ -234,6 +239,7 @@ export default function GuidePage() {
           ))}
         </Panel>
       </section>
+      )}
 
       {/* ── RQI layers ────────────────────────────────────────────────────── */}
       <section className="space-y-3">
@@ -433,7 +439,7 @@ export default function GuidePage() {
             <div className="flex h-full flex-col gap-3">
               <CellTitle>What each screen shows</CellTitle>
               <div className="divide-y divide-slate-100">
-                {TABS.map((t) => (
+                {screens.map((t) => (
                   <div
                     key={t.n}
                     className="grid gap-x-4 gap-y-0.5 py-2 text-[12.5px] leading-5 sm:grid-cols-[130px_minmax(0,1fr)]"
@@ -577,19 +583,19 @@ const PIPELINE = [
 
 const TABS = [
   // The seven dashboard tabs, left → right.
-  { n: "Overview", d: "Headline wellbeing (OWI), by level, stress mix, coverage, roadmap, and quarter-over-quarter trends." },
-  { n: "Health & Risk", d: "Vulnerability distribution + a department heatmap (participation / validity / trust)." },
-  { n: "Engagement", d: "Completion by department and level against the 70% participation floor." },
-  { n: "Impact", d: "Programme ROI (self-reported) and the risk-vs-impact outcomes view." },
-  { n: "Verify", d: "How much to trust the signal — trust & candour, the proof engine, the outcomes ledger, and guardrail integrity." },
-  { n: "Act & Programmes", d: "Intervention recommendations + the delivery pipeline across care, people-development, and lifecycle support." },
-  { n: "Reports & Govern", d: "Disclosure & certification, the committee tracker, data & privacy, clinical quality, and brand / white-label." },
+  { n: "Overview", c: "tab:overview", d: "Headline wellbeing (OWI), by level, stress mix, coverage, roadmap, and quarter-over-quarter trends." },
+  { n: "Health & Risk", c: "tab:health", d: "Vulnerability distribution + a department heatmap (participation / validity / trust)." },
+  { n: "Engagement", c: "tab:engagement", d: "Completion by department and level against the 70% participation floor." },
+  { n: "Impact", c: "tab:impact", d: "Programme ROI (self-reported) and the risk-vs-impact outcomes view." },
+  { n: "Verify", c: "tab:verify", d: "How much to trust the signal — trust & candour, the proof engine, the outcomes ledger, and guardrail integrity." },
+  { n: "Act & Programmes", c: "tab:act", d: "Intervention recommendations + the delivery pipeline across care, people-development, and lifecycle support." },
+  { n: "Reports & Govern", c: "tab:govern", d: "Disclosure & certification, the committee tracker, data & privacy, clinical quality, and brand / white-label." },
   // The standalone screens in the sidebar.
-  { n: "Participation", d: "The named roster — who completed vs. who hasn’t, status only (never any answers)." },
-  { n: "Evidence", d: "The adversarial kill-review: advocate vs. executioner arguments and the impact P&L behind each metric." },
-  { n: "Health Report", d: "A one-click printable quarterly org-health summary (aggregate only)." },
-  { n: "My Teams", d: "For managers: their own team’s direction (a band, not a number) + one finding + one play, at k≥5." },
-  { n: "Confidence strip", d: "Always on top: DCS · Validity · Trust." },
+  { n: "Participation", c: "module:participation", d: "The named roster — who completed vs. who hasn’t, status only (never any answers)." },
+  { n: "Evidence", c: "module:proof", d: "The adversarial kill-review: advocate vs. executioner arguments and the impact P&L behind each metric." },
+  { n: "Health Report", c: "module:report", d: "A one-click printable quarterly org-health summary (aggregate only)." },
+  { n: "My Teams", c: null, d: "For managers: their own team’s direction (a band, not a number) + one finding + one play, at k≥5." },
+  { n: "Confidence strip", c: "module:confidence", d: "Always on top: DCS · Validity · Trust." },
 ];
 
 const ADVANTAGES = [
@@ -641,6 +647,7 @@ const GLOSSARY_INSTRUMENTS = [
 const TIER2_GROUPS = [
   {
     label: "Dynamics & forecast",
+    cap: "module:dynamics",
     items: [
       { s: "MoodCast", n: "MoodCast (next-quarter OWI)", d: "Projects where the org's wellbeing score is heading next quarter from the recent trend; shown only with ≥3 published quarters." },
       { s: "Pulse Volatility", n: "Pulse Volatility", d: "How much monthly mood swings — low = steady, high = unstable. Bands: ≤5 green, ≤10 amber, >10 coral." },
@@ -651,6 +658,7 @@ const TIER2_GROUPS = [
   },
   {
     label: "Managers & engagement",
+    cap: "module:managers",
     items: [
       { s: "Manager Calibration", n: "Manager Calibration", d: "Flags “everything's fine” managers whose self-view is rosier than their team's data. Median gap in OWI points (≤5 green, ≤15 amber, >15 coral); manager-group only, never one named manager." },
       { s: "Manager Cert Gap", n: "Manager Certification Gap", d: "Whether teams led by D30-certified managers score better on wellbeing than uncertified ones (in OWI points) — is the training paying off." },
@@ -662,6 +670,7 @@ const TIER2_GROUPS = [
   },
   {
     label: "Care operations (the KCI scorecard)",
+    cap: "module:care",
     items: [
       { s: "Help-Seeking Conversion", n: "Help-Seeking Conversion", d: "Of at-risk employees, the share who went on to engage with care." },
       { s: "Help-Seeking Latency", n: "Help-Seeking Latency", d: "Median days from an at-risk flag to actually starting care (lower is better)." },
@@ -673,6 +682,7 @@ const TIER2_GROUPS = [
   },
   {
     label: "Candour & integrity — are the numbers honest?",
+    cap: "module:candour",
     items: [
       { s: "ORDI", n: "Observed–Reported Divergence Index", d: "The gap between what teams report (psychological safety) and how they actually behave (observed FieldLens signals)." },
       { s: "Anonymity Delta", n: "Anonymity Delta", d: "Per-department gap between the named quarterly survey and the anonymous pulse; a big gap flags held-back candour." },
@@ -684,6 +694,7 @@ const TIER2_GROUPS = [
   },
   {
     label: "Risk & cost",
+    cap: "module:riskimpact",
     items: [
       { s: "High Stress %", n: "High Perceived Stress (PSS-10)", d: "Share of a group scoring in the high-stress band of PSS-10." },
       { s: "Presenteeism Cost", n: "Presenteeism Cost", d: "Estimated ₹/head lost each year to being at work but underperforming due to poor health." },
@@ -692,6 +703,7 @@ const TIER2_GROUPS = [
   },
   {
     label: "Verify / Evidence / Govern — concepts, not metrics",
+    cap: "tab:verify",
     items: [
       { s: "Proof engine", n: "Proof engine (Verify tab)", d: "Cost per verified improvement, and flags interventions whose measured impact has stalled or declined." },
       { s: "Guardrail integrity", n: "Accelerator / brake pairs (anti-Goodhart)", d: "Flags when a “good news” metric rose while its paired safety counter-metric fell — a sign of gaming, not a real gain." },

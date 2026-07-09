@@ -1,6 +1,7 @@
 "use client";
 
 import { useUrlFilters } from "@/lib/hooks/useFilters";
+import { useCapabilities } from "@/lib/hooks/useCapabilities";
 import { cn } from "@/lib/utils";
 
 export const TABS = [
@@ -17,9 +18,11 @@ export type TabId = (typeof TABS)[number]["id"];
 
 export function TabNav({ defaultPeriod }: { defaultPeriod: string }) {
   const { state, setParam } = useUrlFilters(defaultPeriod);
+  const { has } = useCapabilities();
+  const visibleTabs = TABS.filter((t) => has(`tab:${t.id}`));
   return (
     <div className="flex flex-wrap gap-1 border-b border-brand-border">
-      {TABS.map((t) => {
+      {visibleTabs.map((t) => {
         const active = state.tab === t.id;
         return (
           <button

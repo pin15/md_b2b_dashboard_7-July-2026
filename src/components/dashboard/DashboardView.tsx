@@ -12,12 +12,15 @@ import { ActTab } from "@/components/dashboard/tabs/ActTab";
 import { GovernTab } from "@/components/dashboard/tabs/GovernTab";
 import { Heartbeat } from "@phosphor-icons/react";
 import { useUrlFilters } from "@/lib/hooks/useFilters";
+import { useCapabilities } from "@/lib/hooks/useCapabilities";
 import type { DashboardFilters } from "@/lib/graphql/types";
 
 const DEFAULT_PERIOD = "2026-Q2";
 
 export function DashboardView() {
   const { state } = useUrlFilters(DEFAULT_PERIOD);
+  const { has } = useCapabilities();
+  const tabOn = (id: string) => state.tab === id && has(`tab:${id}`);
   const filters: DashboardFilters = {
     period: state.period,
     department: state.department,
@@ -49,19 +52,21 @@ export function DashboardView() {
       <div className="xl:hidden">
         <FilterBar defaultPeriod={DEFAULT_PERIOD} />
       </div>
-      {state.tab === "health" && <DataConfidenceStrip period={filters.period} />}
+      {state.tab === "health" && has("tab:health") && has("module:confidence") && (
+        <DataConfidenceStrip period={filters.period} />
+      )}
       {/* Tabs live in the sidebar rail on md+; this is the phone fallback (rail hidden). */}
       <div className="md:hidden">
         <TabNav defaultPeriod={DEFAULT_PERIOD} />
       </div>
 
-      {state.tab === "overview" && <OverviewTab filters={filters} />}
-      {state.tab === "health" && <HealthRiskTab filters={filters} />}
-      {state.tab === "engagement" && <EngagementTab filters={filters} />}
-      {state.tab === "impact" && <ImpactTab filters={filters} />}
-      {state.tab === "verify" && <VerifyTab filters={filters} />}
-      {state.tab === "act" && <ActTab filters={filters} />}
-      {state.tab === "govern" && <GovernTab filters={filters} />}
+      {tabOn("overview") && <OverviewTab filters={filters} />}
+      {tabOn("health") && <HealthRiskTab filters={filters} />}
+      {tabOn("engagement") && <EngagementTab filters={filters} />}
+      {tabOn("impact") && <ImpactTab filters={filters} />}
+      {tabOn("verify") && <VerifyTab filters={filters} />}
+      {tabOn("act") && <ActTab filters={filters} />}
+      {tabOn("govern") && <GovernTab filters={filters} />}
     </div>
   );
 }
