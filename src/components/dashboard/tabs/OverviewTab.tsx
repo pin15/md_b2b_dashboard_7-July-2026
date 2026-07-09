@@ -133,6 +133,8 @@ export function OverviewTab({ filters }: { filters: DashboardFilters }) {
               pendingNote="needs PSS-10 in the battery"
               hint="PSS ≥ 68 share"
               alert={highStressBreached ? "above 20% threshold" : undefined}
+              glossary="PSS-10 · Perceived Stress Scale"
+              tooltip="High Stress — the share of respondents whose PSS-10 (Perceived Stress Scale, 10 items → 0–100) falls in the high band (≥68, Cohen). Formula: high-band members ÷ scored members × 100."
             />
           </div>
           <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
@@ -142,6 +144,8 @@ export function OverviewTab({ filters }: { filters: DashboardFilters }) {
               unit="%"
               pendingNote="OBI p75/p90 set after Wave-1 (B3)"
               hint="OBI ≥ p75 share"
+              glossary="OBI · Oldenburg Burnout Inventory (OLBI)"
+              tooltip="Burnout Risk — the share of respondents whose OLBI (Oldenburg Burnout Inventory: exhaustion + disengagement) sits at or above the 75th percentile of the Wave-1 norm. Formula: members ≥ p75 ÷ scored members × 100."
             />
           </div>
           <div className="p-6">
@@ -151,6 +155,8 @@ export function OverviewTab({ filters }: { filters: DashboardFilters }) {
               unit="%"
               pendingNote="needs session-booking data"
               hint="% attended ≥ 1 session"
+              glossary="Utilization · ≥1 session attended"
+              tooltip="Therapy Utilization — the share of covered lives who attended at least one 1:1 therapy session this period. Formula: members with ≥1 attended session ÷ covered lives × 100."
             />
           </div>
         </Panel>
@@ -346,7 +352,14 @@ function OwiHero({ value, pendingNote }: { value: number | null; pendingNote: st
         )}
       </div>
       <div className="mt-auto pt-1">
-        <Foot>Green ≥ 70 · Amber 55–69 · Coral &lt; 55</Foot>
+        <Foot>
+          <span
+            title="OWI — Organisational Wellbeing Index: a 0–100 headline score blending WHO-5 (+), PSS-10 (−) and OLBI (−), weights renormalised. Bands: Green ≥70 · Amber 55–69 · Coral <55. Currently pending clinical sign-off."
+            className="cursor-help border-b border-dotted border-slate-300"
+          >
+            Green ≥ 70 · Amber 55–69 · Coral &lt; 55
+          </span>
+        </Foot>
       </div>
     </div>
   );
@@ -359,6 +372,8 @@ function HeadlineStat({
   hint,
   pendingNote,
   alert,
+  glossary,
+  tooltip,
 }: {
   label: string;
   value: number | null;
@@ -366,6 +381,8 @@ function HeadlineStat({
   hint?: string;
   pendingNote?: string;
   alert?: string;
+  glossary?: string; // full form of the short form (bottom line, aligned with the OWI band line)
+  tooltip?: string; // the full explanation + formula, revealed on hover
 }) {
   const pending = value === null;
   return (
@@ -391,6 +408,18 @@ function HeadlineStat({
       )}
       {!pending && alert && hint && (
         <span className="text-[12px] leading-4 text-slate-500">{hint}</span>
+      )}
+      {glossary && (
+        <div className="mt-auto pt-1">
+          <Foot>
+            <span
+              title={tooltip}
+              className={tooltip ? "cursor-help border-b border-dotted border-slate-300" : undefined}
+            >
+              {glossary}
+            </span>
+          </Foot>
+        </div>
       )}
     </div>
   );
