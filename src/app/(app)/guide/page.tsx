@@ -170,6 +170,171 @@ export default function GuidePage() {
         </Panel>
       </section>
 
+      {/* ── Glossary ──────────────────────────────────────────────────────── */}
+      <section className="space-y-3">
+        <SectionHeader
+          title="Every short form, in plain English"
+          meta={`${GLOSSARY_INDICES.length + GLOSSARY_INSTRUMENTS.length} terms`}
+        />
+        <Panel className="overflow-hidden">
+          <div className={cn("hidden border-b border-slate-100 px-6 py-2.5 md:grid", GLOSSARY_COLS)}>
+            <MicroLabel>Short form</MicroLabel>
+            <MicroLabel>Full name</MicroLabel>
+            <MicroLabel>Plain meaning</MicroLabel>
+          </div>
+          <div className="px-6 pt-3.5">
+            <MicroLabel>Indices &amp; scores</MicroLabel>
+          </div>
+          <div className="mt-1 divide-y divide-slate-100">
+            {GLOSSARY_INDICES.map((g) => (
+              <div key={g.s} className={cn("flex flex-col gap-0.5 px-6 py-3 md:grid md:gap-6", GLOSSARY_COLS)}>
+                <p className="text-[13.5px] font-semibold tracking-[-0.01em] text-slate-900">{g.s}</p>
+                <p className="text-[12.5px] leading-5 text-slate-600">{g.n}</p>
+                <p className="text-[12.5px] leading-relaxed text-slate-500">{g.d}</p>
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-slate-100 px-6 pt-3.5">
+            <MicroLabel>Instruments &amp; items</MicroLabel>
+          </div>
+          <div className="mt-1 divide-y divide-slate-100">
+            {GLOSSARY_INSTRUMENTS.map((g) => (
+              <div key={g.s} className={cn("flex flex-col gap-0.5 px-6 py-3 md:grid md:gap-6", GLOSSARY_COLS)}>
+                <p className="text-[13.5px] font-semibold tracking-[-0.01em] text-slate-900">{g.s}</p>
+                <p className="text-[12.5px] leading-5 text-slate-600">{g.n}</p>
+                <p className="text-[12.5px] leading-relaxed text-slate-500">{g.d}</p>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      </section>
+
+      {/* ── RQI layers ────────────────────────────────────────────────────── */}
+      <section className="space-y-3">
+        <SectionHeader
+          title="How responses are quality-checked (RQI), layer by layer"
+          meta={`${RQI_LAYERS.length} layers`}
+        />
+        <Panel className="overflow-hidden">
+          <div className="divide-y divide-slate-100">
+            {RQI_LAYERS.map((r, i) => (
+              <div
+                key={r.t}
+                className="flex flex-col gap-2 px-6 py-4 md:grid md:grid-cols-[210px_minmax(0,1fr)] md:gap-6"
+              >
+                <div className="flex items-baseline gap-3">
+                  <span className="text-[11px] font-medium tabular-nums text-slate-300">0{i + 1}</span>
+                  <div>
+                    <p className="text-[13.5px] font-semibold tracking-[-0.01em] text-slate-900">{r.t}</p>
+                    <p className="text-[11.5px] leading-4 text-slate-400">{r.k}</p>
+                  </div>
+                </div>
+                <ul className="space-y-1.5">
+                  {r.rules.map((x, j) => (
+                    <li key={j} className="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-600">
+                      <span aria-hidden className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-slate-300" />
+                      <span className="min-w-0">{x}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-slate-100 px-6 py-3.5">
+            <Foot>
+              A response is dropped from the averages once it trips <Strong>≥2 independent flags</Strong> — one
+              lone flag never excludes anyone. Safety detections (PHQ-9 item-9, MHSF suicide branch, pulse
+              keywords) are separate: they fire <Strong>before</Strong> RQI, unconditionally, and are never
+              suppressed.
+            </Foot>
+          </div>
+        </Panel>
+      </section>
+
+      {/* ── Worked examples ───────────────────────────────────────────────── */}
+      <section className="space-y-3">
+        <SectionHeader title="Worked examples" meta="the maths, with numbers" />
+        <Panel className="grid md:grid-cols-2">
+          <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
+            <div className="flex h-full flex-col gap-2">
+              <CellTitle>Reading a Trust Quotient</CellTitle>
+              <p className="font-mono text-[11.5px] leading-4 text-slate-600">
+                TQ = participation × validity × (1 − divergence) × trust-item × 100
+              </p>
+              <p className="text-[12.5px] leading-relaxed text-slate-500">
+                A score of <Strong>42.1</Strong> sits below the 60 floor: even after weighting for who
+                responded and how validly, the org&apos;s trust in how its wellbeing data is handled — the
+                direct TRUST-1 item plus the honesty-gap signal — is low.
+              </p>
+              <div className="mt-auto flex flex-wrap gap-x-4 gap-y-1.5 pt-1">
+                <BandDot color={SEVERITY.coral} label="< 60 · below floor" />
+                <BandDot color={SEVERITY.amber} label="60–69.9 · short of target" />
+                <BandDot color={SEVERITY.green} label="≥ 70 · strong" />
+              </div>
+            </div>
+          </div>
+          <div className="p-6">
+            <div className="flex h-full flex-col gap-2">
+              <CellTitle>Reading a Channel Divergence</CellTitle>
+              <p className="font-mono text-[11.5px] leading-4 text-slate-600">
+                CI = avg(WHO-5, identified) − avg(pulse, anonymous)
+              </p>
+              <p className="text-[12.5px] leading-relaxed text-slate-500">
+                A plain 0–100 point gap, <Strong>cohort vs cohort</Strong> (same department/period — never a
+                person against their own answers). Positive = the named survey looks rosier than the anonymous
+                pulse (a &ldquo;fine to my face&rdquo; gap).
+              </p>
+              <div className="mt-auto flex flex-wrap gap-x-4 gap-y-1.5 pt-1">
+                <BandDot color={SEVERITY.green} label="≤ 5" />
+                <BandDot color={SEVERITY.amber} label="≤ 15" />
+                <BandDot color={SEVERITY.coral} label="> 15" />
+              </div>
+            </div>
+          </div>
+        </Panel>
+        <Panel className="overflow-hidden">
+          <div className="px-6 py-4">
+            <CellTitle>A Programme ROI, end to end</CellTitle>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-slate-500">
+              A 500-person org that spent <Strong>₹25L</Strong> on the programme this year. Salary, day-cost and
+              replacement-cost are the employer&apos;s own inputs; the deltas are self-reported:
+            </p>
+          </div>
+          <div className={cn("hidden border-y border-slate-100 px-6 py-2.5 md:grid", ROI_COLS)}>
+            <MicroLabel>Term</MicroLabel>
+            <MicroLabel>How it&apos;s worked out</MicroLabel>
+            <MicroLabel>
+              <span className="block text-right">Saved</span>
+            </MicroLabel>
+          </div>
+          <div className="divide-y divide-slate-100">
+            {ROI_EXAMPLE.map((r) => (
+              <div key={r.term} className={cn("flex flex-col gap-0.5 px-6 py-3 md:grid md:gap-6", ROI_COLS)}>
+                <span className="text-[13px] font-medium leading-5 text-slate-900">{r.term}</span>
+                <span className="font-mono text-[11.5px] leading-4 text-slate-500">{r.calc}</span>
+                <span className="text-[13px] font-medium tabular-nums leading-5 text-slate-700 md:text-right">
+                  {r.savings}
+                </span>
+              </div>
+            ))}
+            <div className={cn("flex flex-col gap-0.5 px-6 py-3 md:grid md:gap-6", ROI_COLS)}>
+              <span className="text-[13px] font-semibold leading-5 text-slate-900">Total saved</span>
+              <span className="font-mono text-[11.5px] leading-4 text-slate-500">₹1Cr + ₹11L + ₹63L</span>
+              <span className="text-[13px] font-semibold tabular-nums leading-5 text-slate-900 md:text-right">
+                ≈ ₹1.74Cr
+              </span>
+            </div>
+          </div>
+          <div className="border-t border-slate-100 px-6 py-3.5">
+            <Foot>
+              <Strong>ROI = ₹1.74Cr ÷ ₹25L ≈ 4.16×</Strong> — for every ₹1 the employer spent, we estimate
+              ₹4.16 in value came back. It&apos;s labelled an estimate because the deltas are self-reported
+              (WPAI-GH); an HRMS-verified upgrade is optional.
+            </Foot>
+          </div>
+        </Panel>
+      </section>
+
       {/* ── Behind each number ────────────────────────────────────────────── */}
       <section className="space-y-3">
         <SectionHeader title="Behind each number" />
@@ -417,6 +582,79 @@ const FAQ = [
   { q: "Why can’t I see who is struggling?", a: "By design. Individual wellbeing and risk are never employer-visible. If someone is at risk, a clinician — not you — is alerted, privately." },
   { q: "When will my team show up?", a: "Once at least 5 of your team complete the current check-in. Until then it stays below threshold." },
   { q: "Can I trust a ‘directional’ number?", a: "Read it as a direction, not a precise figure. Low confidence usually means thin participation or low validity — push participation up and it sharpens." },
+];
+
+const GLOSSARY_COLS = "md:grid-cols-[104px_minmax(0,210px)_minmax(0,1fr)] md:items-baseline md:gap-6";
+
+const GLOSSARY_INDICES = [
+  { s: "OWI", n: "Organisational Wellbeing Index", d: "Headline 0–100 wellbeing score, blending WHO-5 (+), PSS-10 (−) and OLBI (−). Pending clinical sign-off." },
+  { s: "VDI", n: "Vulnerability Distribution Index", d: "What share of a group sits in each clinical band (low/moderate/high/critical), from the worst of PHQ-9 / GAD-7." },
+  { s: "DCS", n: "Data Confidence Score", d: "Geometric mean of participation, validity and representativeness — one read on how much to trust a snapshot." },
+  { s: "TQ", n: "Trust Quotient", d: "participation × validity × (1 − divergence) × trust-item × 100 — how trustworthy the signal is. Floor 60, target 70." },
+  { s: "RQI", n: "Response-quality check", d: "The automated screen that flags and excludes low-quality responses; it produces the Response Validity Rate." },
+  { s: "CI", n: "Channel Divergence Index", d: "Point gap between identified (WHO-5) and anonymous (pulse) favourability — a “fine to my face” honesty signal." },
+  { s: "BRI", n: "Burnout Risk Index", d: "Burnout level from OLBI. Thresholds are set after the first full wave of data (currently a calm gradient)." },
+  { s: "ROI", n: "Return on Investment", d: "Estimated ₹ saved (presenteeism + absence + attrition) for every ₹ spent on the programme." },
+  { s: "k / k-anon", n: "k-anonymity floor", d: "The group-size floor of 5 — no cell is ever shown for fewer than 5 people." },
+];
+
+const GLOSSARY_INSTRUMENTS = [
+  { s: "WHO-5", n: "WHO-5 Well-Being Index", d: "5-item wellbeing, native 0–100 (≤50 screens for low wellbeing)." },
+  { s: "PHQ-9", n: "Patient Health Questionnaire-9", d: "Depression severity, 0–27 (≥15 = moderately-severe or worse)." },
+  { s: "GAD-7", n: "Generalised Anxiety Disorder-7", d: "Anxiety severity, 0–21 (≥15 = severe)." },
+  { s: "PSS-10", n: "Perceived Stress Scale-10", d: "Perceived stress, Cohen bands: Low <35 / Moderate / High ≥68." },
+  { s: "OLBI", n: "Oldenburg Burnout Inventory", d: "Burnout: exhaustion + disengagement composite." },
+  { s: "UWES", n: "Utrecht Work Engagement Scale", d: "Work engagement / vigor." },
+  { s: "ISI", n: "Insomnia Severity Index", d: "Sleep / insomnia severity (≥16 ≈ clinical insomnia)." },
+  { s: "WPAI-GH", n: "Work Productivity & Activity Impairment: General Health", d: "Self-reported presenteeism + absence — feeds Programme ROI." },
+  { s: "MHSF", n: "Mental Health Screening Form", d: "Safety / crisis screen; its suicide branch fires before RQI, unconditionally." },
+  { s: "TRUST-1", n: "Single trust item", d: "One direct Likert item on trusting how the org + MoodScale handle wellbeing data — feeds TQ (distinct from the separately-tracked psychological-safety scale)." },
+  { s: "Pulse", n: "Monthly anonymous check-in", d: "A short, name-free monthly survey — the anonymous channel that CI compares against." },
+];
+
+const RQI_LAYERS = [
+  {
+    t: "Timing", k: "fast / careless responding",
+    rules: [
+      "Speed-floor: median item latency < 800ms (needs ≥3 timed items).",
+      "Total-speed: the whole battery finished faster than 300ms × item count.",
+      "Rhythm: inter-item timing too metronomic (coefficient of variation < 0.08, ≥6 items).",
+    ],
+  },
+  {
+    t: "Pattern", k: "straight-lining",
+    rules: [
+      "Long-string: the same answer repeated ≥20 times in a row across a mixed battery.",
+      "Flat variance: within-person response variance too low (SD < 0.30) — plus even-odd and multivariate-outlier checks.",
+    ],
+  },
+  {
+    t: "Contradiction pairs", k: "~11 cross-instrument pairs",
+    rules: [
+      "e.g. high wellbeing (WHO-5 ≥ 70) with severe depression (PHQ-9 ≥ 15); low exhaustion with high engagement (UWES ≥ 78); severe insomnia (ISI ≥ 16) with high pulse vigor.",
+      "Spans WHO-5, PHQ-9, GAD-7, PSS-10, OLBI, UWES, ISI + custom work-life / sleep / exercise / withdrawal items.",
+    ],
+  },
+  {
+    t: "Attention checks", k: "instructed-response probes",
+    rules: [
+      "Planted items with a known correct answer (e.g. “select option 3 here”); a wrong answer flags the session.",
+    ],
+  },
+  {
+    t: "Longitudinal", k: "wave-over-wave",
+    rules: [
+      "An identical response vector to the prior wave across ≥12 overlapping items (especially paired with a suspiciously fast finish).",
+    ],
+  },
+];
+
+const ROI_COLS = "md:grid-cols-[150px_minmax(0,1fr)_110px] md:items-baseline md:gap-6";
+
+const ROI_EXAMPLE = [
+  { term: "Presenteeism", calc: "8-pt gain → 8% × ₹8L salary × 500", savings: "≈ ₹1Cr" },
+  { term: "Absence", calc: "1.5 days fewer → 1.5 × ₹15,000/day × 500", savings: "≈ ₹11L" },
+  { term: "Attrition", calc: "3-pt drop → 3% × 500 × ₹42L replacement", savings: "≈ ₹63L" },
 ];
 
 /* ── presentational helpers ───────────────────────────────────────────────── */
