@@ -13,6 +13,9 @@ import {
 } from "@/components/ui/panels";
 import { useMetricCells, useOrgFamilyCoverage } from "@/lib/hooks/useDashboardData";
 import { SEVERITY, gradientColor } from "@/lib/severity";
+import { HintTip } from "@/components/ui/HintTip";
+import { GLOSSARY } from "@/lib/glossary";
+import type { ReactNode } from "react";
 import type { DashboardFilters, MetricCell } from "@/lib/graphql/types";
 
 /**
@@ -137,7 +140,11 @@ export function EngagementTab({ filters }: { filters: DashboardFilters }) {
               <SignalCell
                 label="Work engagement"
                 cell={uwesCell}
-                hint="UWES-9 · vigour / dedication / absorption"
+                hint={
+                  <HintTip tip={GLOSSARY.UWES}>
+                    UWES-9 · vigour / dedication / absorption
+                  </HintTip>
+                }
               />
             </div>
             <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
@@ -338,7 +345,7 @@ function SignalCell({
   label: string;
   cell?: MetricCell;
   unit?: string;
-  hint: string;
+  hint: ReactNode;
 }) {
   const suppressed = !!cell?.suppressed;
   const pending = !cell;

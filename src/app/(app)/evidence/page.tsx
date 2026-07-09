@@ -11,6 +11,8 @@ import {
   BandDot,
   PanelSkeleton,
 } from "@/components/ui/panels";
+import { HintTip } from "@/components/ui/HintTip";
+import { GLOSSARY } from "@/lib/glossary";
 import { useImpactVerdict, useRepeatLessonRate } from "@/lib/evidence/hooks";
 import { useEvidenceLadder } from "@/lib/evidence/ladderHooks";
 import { useUrlFilters } from "@/lib/hooks/useFilters";
@@ -345,8 +347,8 @@ function EvidenceLadderSection({ period }: { period: string }) {
             The ladder engine is built — rungs pending
           </p>
           <p className="mx-auto mt-1 max-w-lg text-[12.5px] leading-relaxed text-slate-400">
-            For each programme, the highest honestly-supported rung with its effect size and 95%
-            CI — {LADDER_GUIDE}. The engines (<Code>get_org_evidence_ladder</Code>,{" "}
+            For each programme, the highest honestly-supported rung with its effect size and{" "}
+            <HintTip tip={GLOSSARY["95% CI"]}>95% CI</HintTip> — {LADDER_GUIDE}. The engines (<Code>get_org_evidence_ladder</Code>,{" "}
             <Code>compute_evidence_record</Code>, <Code>get_org_rollout_contrast</Code>) are in
             place; each programme&apos;s rung appears once the gateway field is wired — and, by
             design, only as high as the study honestly supports. Never estimated.
@@ -397,7 +399,9 @@ function EvidenceLadderSection({ period }: { period: string }) {
           >
             <MicroLabel>Programme</MicroLabel>
             <MicroLabel>
-              <span className="block text-right">Effect [95% CI]</span>
+              <span className="block text-right">
+                Effect [<HintTip tip={GLOSSARY["95% CI"]}>95% CI</HintTip>]
+              </span>
             </MicroLabel>
             <MicroLabel>
               <span className="block text-right">Design</span>
@@ -440,7 +444,8 @@ function EvidenceLadderSection({ period }: { period: string }) {
           <div className="border-t border-slate-100 px-6 py-3.5">
             <Foot>
               Ladder-honest: a programme&apos;s rung is never inflated above the design that
-              produced it. Aggregate-only (k≥5 in-DB). Effect &amp; CI are blank, never
+              produced it. Aggregate-only (k≥5 in-DB). Effect &amp;{" "}
+              <HintTip tip={GLOSSARY["95% CI"]}>CI</HintTip> are blank, never
               fabricated, where a cohort is suppressed or no comparison/arm exists. E3
               (stepped-wedge) reads treatment-vs-control rollout arms.
             </Foot>
@@ -458,8 +463,9 @@ function OutcomesLedgerCell() {
     <div className="flex h-full flex-col gap-3">
       <CellTitle state="retired + published misses">Outcomes ledger</CellTitle>
       <p className="text-[13px] leading-relaxed text-slate-400">
-        The honest public record: retired programmes with their measured effect size and 95% CI,
-        and any <span className="font-medium text-slate-500">published miss</span> — a claim we
+        The honest public record: retired programmes with their measured effect size and{" "}
+        <HintTip tip={GLOSSARY["95% CI"]}>95% CI</HintTip>, and any{" "}
+        <span className="font-medium text-slate-500">published miss</span> — a claim we
         made publicly that did not hold. Empty is the expected state until the first programme is
         retired with a verified effect.
       </p>

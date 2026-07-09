@@ -8,6 +8,8 @@ import { SEVERITY, type GradientBand } from "@/lib/severity";
 import { AcademyCompletionCard } from "@/components/dashboard/AcademyCompletionCard";
 import { CertificationProgressCard } from "@/components/dashboard/CertificationProgressCard";
 import { Manager360Card } from "@/components/dashboard/Manager360Card";
+import { HintTip } from "@/components/ui/HintTip";
+import { GLOSSARY } from "@/lib/glossary";
 
 const DEFAULT_PERIOD = "2026-Q2";
 const BAND_LABEL: Record<string, string> = { green: "Healthy", amber: "Steady", coral: "Needs care" };
@@ -61,7 +63,8 @@ function TeamsContent() {
       <div>
         <h1 className="text-xl font-semibold text-brand-text">{data.team}</h1>
         <p className="text-sm text-brand-muted">
-          Your team only · aggregate at k≥{data.n >= 5 ? 5 : data.n} · directions, never individual scores.
+          Your team only · aggregate at{" "}
+          <HintTip tip={GLOSSARY.k}>k≥{data.n >= 5 ? 5 : data.n}</HintTip> · directions, never individual scores.
         </p>
       </div>
 
@@ -102,7 +105,8 @@ function TeamsContent() {
       </div>
 
       <p className="text-xs text-brand-muted">
-        You never see who responded or any individual&apos;s result — only your team&apos;s aggregate at k≥5.
+        You never see who responded or any individual&apos;s result — only your team&apos;s aggregate at{" "}
+        <HintTip tip={GLOSSARY.k}>k≥5</HintTip>.
       </p>
 
       {/* WS-U U0 — Manager Academy completion (k≥5 aggregate, never an individual). */}

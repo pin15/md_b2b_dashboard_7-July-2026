@@ -32,6 +32,8 @@ import {
   useOrgIncidentUptake,
 } from "@/lib/hooks/useDashboardData";
 import { SEVERITY, gradientColor } from "@/lib/severity";
+import { HintTip } from "@/components/ui/HintTip";
+import { GLOSSARY } from "@/lib/glossary";
 import { Check, ChevronDown } from "lucide-react";
 import type {
   DashboardFilters,
@@ -193,7 +195,7 @@ export function ActTab({ filters }: { filters: DashboardFilters }) {
           </li>
           <li>
             <span className="font-medium text-slate-700">Pending.</span>{" "}
-            OWI/BRI-targeted programmes stay dormant until those metrics publish (clinical
+            <HintTip tip={GLOSSARY.OWI}>OWI</HintTip>/<HintTip tip={GLOSSARY.BRI}>BRI</HintTip>-targeted programmes stay dormant until those metrics publish (clinical
             sign-off) — they appear in the library but recommend nothing until then.
           </li>
           <li>
@@ -497,7 +499,7 @@ function CoachingCell({ period }: { period: string }) {
             <MicroStat
               label="Goal attainment"
               value={data.gasMeanAttainment == null ? "—" : data.gasMeanAttainment.toFixed(1)}
-              hint="GAS mean −2…+2"
+              hint={<HintTip tip={GLOSSARY.GAS}>GAS mean −2…+2</HintTip>}
             />
           </div>
           {data.byProduct.length > 0 && (

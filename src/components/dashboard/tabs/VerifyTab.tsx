@@ -23,6 +23,8 @@ import {
 import { getOrgOrdi } from "@/lib/ordi/ordi";
 import { getOrgFieldLens, type FieldLensSignal } from "@/lib/graphql/fieldlens";
 import { SEVERITY, gradientColor } from "@/lib/severity";
+import { HintTip } from "@/components/ui/HintTip";
+import { GLOSSARY } from "@/lib/glossary";
 import type {
   DashboardFilters,
   VerifyLedgerRow,
@@ -251,7 +253,7 @@ function ChannelDivergenceCell({ period }: { period: string }) {
   return (
     <div className="flex h-full flex-col gap-3">
       <CellTitle state={cell && cell.suppressed ? "below threshold · k≥5" : undefined}>
-        Channel divergence
+        <HintTip tip={GLOSSARY.CI} placement="bottom">Channel divergence</HintTip>
       </CellTitle>
       {suppressed || v == null ? (
         <SuppressedNote>
@@ -299,7 +301,7 @@ function OrdiCell() {
     return (
       <div className="flex h-full flex-col gap-3">
         <CellTitle state={`below threshold · k≥${data?.k ?? 5}`}>
-          Observed–reported divergence
+          <HintTip tip={GLOSSARY.ORDI} placement="bottom">Observed–reported divergence</HintTip>
         </CellTitle>
         <SuppressedNote k={data?.k} />
       </div>
@@ -315,9 +317,13 @@ function OrdiCell() {
 
   return (
     <div className="flex h-full flex-col gap-3">
-      <CellTitle>Observed–reported divergence</CellTitle>
+      <CellTitle>
+        <HintTip tip={GLOSSARY.ORDI} placement="bottom">Observed–reported divergence</HintTip>
+      </CellTitle>
       <div className="flex items-baseline justify-between gap-4 text-[13px] leading-5">
-        <span className="text-slate-600">Reported psychological safety</span>
+        <span className="text-slate-600">
+          <HintTip tip={GLOSSARY.Edmondson}>Reported psychological safety</HintTip>
+        </span>
         <span
           className="shrink-0 font-semibold tabular-nums"
           style={{ color: gradientColor(data!.reported?.value ?? 0, true) }}

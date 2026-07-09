@@ -21,6 +21,9 @@ import {
   useOrgSectorPack,
 } from "@/lib/hooks/useDashboardData";
 import { SEVERITY } from "@/lib/severity";
+import { HintTip } from "@/components/ui/HintTip";
+import { GLOSSARY } from "@/lib/glossary";
+import type { ReactNode } from "react";
 import type { DashboardFilters, OrgRoi, RoiTerm, DecisionCostRow } from "@/lib/graphql/types";
 
 /**
@@ -65,7 +68,10 @@ export function ImpactTab({ filters }: { filters: DashboardFilters }) {
 
       {/* ── Headline outcomes ────────────────────────────────────────────── */}
       <section className="space-y-3">
-        <SectionHeader title="Headline outcomes" meta={`${filters.period} · self-reported (D5)`} />
+        <SectionHeader
+          title="Headline outcomes"
+          meta={<HintTip tip={GLOSSARY.D5}>{`${filters.period} · self-reported (D5)`}</HintTip>}
+        />
         <Panel className="grid md:grid-cols-5">
           <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
             <OutcomeCell
@@ -73,8 +79,8 @@ export function ImpactTab({ filters }: { filters: DashboardFilters }) {
               value={wellnessDelta}
               unit="pts"
               delta={wellnessDelta}
-              pendingNote="OWI sign-off + baseline quarter"
-              foot="OWI vs baseline"
+              pendingNote={<HintTip tip={GLOSSARY.OWI}>OWI sign-off + baseline quarter</HintTip>}
+              foot={<HintTip tip={GLOSSARY.OWI}>OWI vs baseline</HintTip>}
             />
           </div>
           <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
@@ -90,16 +96,18 @@ export function ImpactTab({ filters }: { filters: DashboardFilters }) {
             <OutcomeCell
               label="Work-life balance (L1)"
               value={null}
-              pendingNote="WLI-5 not yet aggregated"
-              foot="WLI-5"
+              pendingNote={<HintTip tip={GLOSSARY["WLI-5"]}>WLI-5 not yet aggregated</HintTip>}
+              foot={<HintTip tip={GLOSSARY["WLI-5"]}>WLI-5</HintTip>}
             />
           </div>
           <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
             <OutcomeCell
               label="Psych safety (L3)"
               value={null}
-              pendingNote="Edmondson 7-item not yet aggregated"
-              foot="Edmondson exec 7-item"
+              pendingNote={
+                <HintTip tip={GLOSSARY.Edmondson}>Edmondson 7-item not yet aggregated</HintTip>
+              }
+              foot={<HintTip tip={GLOSSARY.Edmondson}>Edmondson exec 7-item</HintTip>}
             />
           </div>
           <div className="p-6">
@@ -111,8 +119,10 @@ export function ImpactTab({ filters }: { filters: DashboardFilters }) {
                   : null
               }
               suppressed={presenteeismCell?.suppressed}
-              pendingNote="WPAI-derived cost — accruing"
-              foot="annualised presenteeism ₹ (WPAI-GH)"
+              pendingNote={<HintTip tip={GLOSSARY.WPAI}>WPAI-derived cost — accruing</HintTip>}
+              foot={
+                <HintTip tip={GLOSSARY["WPAI-GH"]}>annualised presenteeism ₹ (WPAI-GH)</HintTip>
+              }
             />
           </div>
         </Panel>
@@ -168,8 +178,8 @@ function OutcomeCell({
   unit?: string;
   delta?: number | null;
   suppressed?: boolean;
-  pendingNote?: string;
-  foot: string;
+  pendingNote?: ReactNode;
+  foot: ReactNode;
 }) {
   return (
     <div className="flex h-full flex-col gap-1.5">
@@ -267,7 +277,8 @@ function RoiPanel({ roi }: { roi: OrgRoi | undefined }) {
 
       <div className="border-t border-slate-100 px-6 py-3.5">
         <Foot>
-          {roi.label} (presenteeism + absence) + OWI Δ + Attrition Risk, baseline → current.
+          {roi.label} (presenteeism + absence) + <HintTip tip={GLOSSARY.OWI}>OWI Δ</HintTip> +
+          Attrition Risk, baseline → current.
           Connect an HRMS to replace estimates with verified attendance (Phase-2 upsell).
         </Foot>
       </div>
@@ -567,8 +578,9 @@ function RiskImpactSections({ period }: { period: string }) {
                 )}
                 <div className="mt-auto pt-1">
                   <Foot>
-                    Reliable clinical improvements (RCI) per 1,000 covered lives,{" "}
-                    {y?.window ?? "trailing 12m"}. Reads blank below the privacy floor.
+                    <HintTip tip={GLOSSARY.RCI}>Reliable clinical improvements (RCI)</HintTip> per
+                    1,000 covered lives, {y?.window ?? "trailing 12m"}. Reads blank below the privacy
+                    floor.
                   </Foot>
                 </div>
               </div>
@@ -581,7 +593,11 @@ function RiskImpactSections({ period }: { period: string }) {
       <section className="space-y-3">
         <SectionHeader
           title="Decision cost ledger"
-          meta={rows.length > 0 ? `${rows.length} decisions · OWI points · 95% CI` : undefined}
+          meta={
+            rows.length > 0 ? (
+              <HintTip tip={GLOSSARY.OWI}>{`${rows.length} decisions · OWI points · 95% CI`}</HintTip>
+            ) : undefined
+          }
         />
         {rows.length === 0 ? (
           <Panel className="px-6 py-10 text-center">

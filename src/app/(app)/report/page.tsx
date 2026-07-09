@@ -1,6 +1,9 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import { HintTip } from "@/components/ui/HintTip";
+import { GLOSSARY } from "@/lib/glossary";
 import {
   useOverview,
   useDataConfidence,
@@ -119,7 +122,14 @@ function ReportContent() {
             </div>
             <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
               <HeadlineCell
-                label="Org wellbeing · OWI"
+                label={
+                  <>
+                    Org wellbeing ·{" "}
+                    <HintTip tip={GLOSSARY.OWI} placement="bottom">
+                      OWI
+                    </HintTip>
+                  </>
+                }
                 value={owi == null ? null : String(owi)}
                 valueColor={owi == null ? undefined : SEVERITY[owiBand(owi)]}
                 hint="0–100 wellbeing index"
@@ -185,7 +195,11 @@ function ReportContent() {
             <div className="p-6">
               <h4 className="text-[13.5px] font-semibold tracking-[-0.01em] text-slate-900">
                 Vulnerability distribution
-                <span className="ml-1.5 font-normal text-slate-400">VDI</span>
+                <span className="ml-1.5 font-normal text-slate-400">
+                  <HintTip tip={GLOSSARY.VDI} placement="bottom">
+                    VDI
+                  </HintTip>
+                </span>
               </h4>
               <div className="mt-4 flex flex-col gap-3">
                 {(["low", "moderate", "high", "critical"] as const).map((band) => {
@@ -276,8 +290,10 @@ function ReportContent() {
               </div>
               {points.length === 0 ? (
                 <p className="mt-3 text-[13px] leading-relaxed text-slate-400">
-                  Building — each department plots once perceived stress (PSS-10) and work
-                  engagement (UWES) are both live at k≥5. No positions are estimated.
+                  Building — each department plots once perceived stress (
+                  <HintTip tip={GLOSSARY["PSS-10"]}>PSS-10</HintTip>) and work engagement (
+                  <HintTip tip={GLOSSARY.UWES}>UWES</HintTip>) are both live at k≥5. No positions
+                  are estimated.
                 </p>
               ) : (
                 <div className="mt-3">
@@ -330,7 +346,14 @@ function ReportContent() {
 
         {/* ── Burnout risk × department × 4 quarters — honest-pending shell. ── */}
         <section className="space-y-3">
-          <SectionHeader title="Burnout risk by department" meta="BRI · last 4 quarters · k≥5" />
+          <SectionHeader
+            title="Burnout risk by department"
+            meta={
+              <>
+                <HintTip tip={GLOSSARY.BRI}>BRI</HintTip> · last 4 quarters · k≥5
+              </>
+            }
+          />
           <Panel className="overflow-hidden">
             {(() => {
               const quarters = lastFourQuarters(period);
@@ -367,7 +390,8 @@ function ReportContent() {
                   <div className="border-t border-slate-100 px-6 py-3.5">
                     <Foot>
                       The Burnout-Risk Index has not published yet — every cell is honestly
-                      pending. Trajectories appear once BRI is live at k≥5; none are estimated.
+                      pending. Trajectories appear once <HintTip tip={GLOSSARY.BRI}>BRI</HintTip> is
+                      live at k≥5; none are estimated.
                     </Foot>
                   </div>
                 </>
@@ -404,7 +428,11 @@ function ReportContent() {
                   <span className="block text-right">Δ</span>
                 </MicroLabel>
                 <MicroLabel>
-                  <span className="block text-right">95% CI</span>
+                  <span className="block text-right">
+                    <HintTip tip={GLOSSARY["95% CI"]} placement="bottom">
+                      95% CI
+                    </HintTip>
+                  </span>
                 </MicroLabel>
               </div>
               <div className="divide-y divide-slate-100">
@@ -455,7 +483,8 @@ function ReportContent() {
               <div className="border-t border-slate-100 px-6 py-3.5">
                 <Foot>
                   Movement is measured; intervention attribution is unlinked until the ACT
-                  programmes engine books Plays. CIs shown for rate metrics only.
+                  programmes engine books Plays.{" "}
+                  <HintTip tip={GLOSSARY["95% CI"]}>CIs</HintTip> shown for rate metrics only.
                 </Foot>
               </div>
             </Panel>
@@ -495,7 +524,7 @@ function ReportContent() {
           <MicroLabel>Methodology &amp; data confidence</MicroLabel>
           <ul className="space-y-1.5 text-[12.5px] leading-relaxed text-slate-500">
             <li>
-              DCS{" "}
+              <HintTip tip={GLOSSARY.DCS}>DCS</HintTip>{" "}
               <span className="tabular-nums text-slate-700">{fmt(conf.data?.dcs)}</span> · response
               validity{" "}
               <span className="tabular-nums text-slate-700">{fmt(conf.data?.validityPct, "%")}</span>{" "}
@@ -511,18 +540,25 @@ function ReportContent() {
             <li>
               <span className="font-medium text-slate-700">Publish gate.</span>{" "}
               Only signed-off (is_active) metrics with a published snapshot contribute a value;
-              pre-sign-off indices (e.g. OWI / BRI) read &ldquo;pending&rdquo;, never a draft
+              pre-sign-off indices (e.g. <HintTip tip={GLOSSARY.OWI}>OWI</HintTip> /{" "}
+              <HintTip tip={GLOSSARY.BRI}>BRI</HintTip>) read &ldquo;pending&rdquo;, never a draft
               number.
             </li>
             <li>
               <span className="font-medium text-slate-700">Confidence.</span>{" "}
-              Deltas carry a 95% CI for rate metrics only; composite/count metrics show
-              &ldquo;pending&rdquo; rather than an invented interval.
+              Deltas carry a <HintTip tip={GLOSSARY["95% CI"]}>95% CI</HintTip> for rate metrics
+              only; composite/count metrics show &ldquo;pending&rdquo; rather than an invented
+              interval.
             </li>
             <li>
               <span className="font-medium text-slate-700">Metric definitions.</span>{" "}
-              Validated instruments at their published versions — PSS-10, UWES, WHO-5, VDI, Trust
-              Quotient, Response-Validity, Participation.
+              Validated instruments at their published versions —{" "}
+              <HintTip tip={GLOSSARY["PSS-10"]}>PSS-10</HintTip>,{" "}
+              <HintTip tip={GLOSSARY.UWES}>UWES</HintTip>,{" "}
+              <HintTip tip={GLOSSARY["WHO-5"]}>WHO-5</HintTip>,{" "}
+              <HintTip tip={GLOSSARY.VDI}>VDI</HintTip>,{" "}
+              <HintTip tip={GLOSSARY.TQ}>Trust Quotient</HintTip>,{" "}
+              <HintTip tip={GLOSSARY.RQI}>Response-Validity</HintTip>, Participation.
             </li>
           </ul>
           <p className="pt-1 text-[11.5px] leading-relaxed text-slate-400">
@@ -546,7 +582,7 @@ function HeadlineCell({
   valueColor,
   pendingNote,
 }: {
-  label: string;
+  label: ReactNode;
   value: string | null;
   unit?: string;
   hint?: string;

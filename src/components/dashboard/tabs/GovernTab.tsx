@@ -22,6 +22,8 @@ import {
   useOrgBrandingProfile,
 } from "@/lib/hooks/useDashboardData";
 import { SEVERITY } from "@/lib/severity";
+import { HintTip } from "@/components/ui/HintTip";
+import { GLOSSARY } from "@/lib/glossary";
 import type {
   DashboardFilters,
   EsgDisclosureLine,
@@ -165,14 +167,28 @@ function ClinicalQualitySection({ period }: { period: string }) {
   if (q.isLoading)
     return (
       <>
-        <SectionHeader title="Clinical quality" meta="KCI scorecard" />
+        <SectionHeader
+          title="Clinical quality"
+          meta={
+            <HintTip tip={GLOSSARY.KCI} placement="bottom">
+              KCI scorecard
+            </HintTip>
+          }
+        />
         <PanelSkeleton />
       </>
     );
   if (q.isError)
     return (
       <>
-        <SectionHeader title="Clinical quality" meta="KCI scorecard" />
+        <SectionHeader
+          title="Clinical quality"
+          meta={
+            <HintTip tip={GLOSSARY.KCI} placement="bottom">
+              KCI scorecard
+            </HintTip>
+          }
+        />
         <Panel className="px-6 py-8">
           <p className="text-[13px]" style={{ color: SEVERITY.red }}>
             Could not load the clinical scorecard — refresh to retry.
@@ -214,7 +230,14 @@ function ClinicalQualitySection({ period }: { period: string }) {
     <>
       <SectionHeader
         title="Clinical quality"
-        meta={`KCI scorecard · n=${data!.membersWithFollowup} members in care · k≥${data!.k ?? 5}`}
+        meta={
+          <>
+            <HintTip tip={GLOSSARY.KCI} placement="bottom">
+              KCI scorecard
+            </HintTip>
+            {` · n=${data!.membersWithFollowup} members in care · k≥${data!.k ?? 5}`}
+          </>
+        }
       />
       <Panel className="overflow-hidden">
         <div className="grid md:grid-cols-3">
