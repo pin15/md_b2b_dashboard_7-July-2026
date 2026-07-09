@@ -209,6 +209,32 @@ export default function GuidePage() {
         </Panel>
       </section>
 
+      {/* ── Deeper-tab metrics ────────────────────────────────────────────── */}
+      <section className="space-y-3">
+        <SectionHeader
+          title="Deeper-tab metrics &amp; concepts"
+          meta={`${TIER2_GROUPS.reduce((n, g) => n + g.items.length, 0)} more`}
+        />
+        <Panel className="overflow-hidden pb-1">
+          {TIER2_GROUPS.map((grp, gi) => (
+            <div key={grp.label} className={cn(gi > 0 && "border-t border-slate-100")}>
+              <div className="px-6 pt-3.5">
+                <MicroLabel>{grp.label}</MicroLabel>
+              </div>
+              <div className="mt-1 divide-y divide-slate-100">
+                {grp.items.map((g) => (
+                  <div key={g.s} className={cn("flex flex-col gap-0.5 px-6 py-3 md:grid md:gap-6", GLOSSARY_COLS)}>
+                    <p className="text-[13.5px] font-semibold tracking-[-0.01em] text-slate-900">{g.s}</p>
+                    <p className="text-[12.5px] leading-5 text-slate-600">{g.n}</p>
+                    <p className="text-[12.5px] leading-relaxed text-slate-500">{g.d}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </Panel>
+      </section>
+
       {/* ── RQI layers ────────────────────────────────────────────────────── */}
       <section className="space-y-3">
         <SectionHeader
@@ -610,6 +636,69 @@ const GLOSSARY_INSTRUMENTS = [
   { s: "MHSF", n: "Mental Health Screening Form", d: "Safety / crisis screen; its suicide branch fires before RQI, unconditionally." },
   { s: "TRUST-1", n: "Single trust item", d: "One direct Likert item on trusting how the org + MoodScale handle wellbeing data — feeds TQ (distinct from the separately-tracked psychological-safety scale)." },
   { s: "Pulse", n: "Monthly anonymous check-in", d: "A short, name-free monthly survey — the anonymous channel that CI compares against." },
+];
+
+const TIER2_GROUPS = [
+  {
+    label: "Dynamics & forecast",
+    items: [
+      { s: "MoodCast", n: "MoodCast (next-quarter OWI)", d: "Projects where the org's wellbeing score is heading next quarter from the recent trend; shown only with ≥3 published quarters." },
+      { s: "Pulse Volatility", n: "Pulse Volatility", d: "How much monthly mood swings — low = steady, high = unstable. Bands: ≤5 green, ≤10 amber, >10 coral." },
+      { s: "Recovery Half-Life", n: "Recovery Half-Life", d: "How many quarters it takes the org to climb halfway back after a wellbeing dip. ≤1 green, ≤2 amber, >2 coral." },
+      { s: "Sleep Index", n: "Sleep Index", d: "0–100 group sleep quality from the ISI instrument. ≥75 thriving, ≥50 steady, else strained." },
+      { s: "Healthy Step-Down Rate", n: "Healthy Step-Down Rate", d: "Of recovered employees, the share stepped out of active care rather than kept dependent. ≥70% green." },
+    ],
+  },
+  {
+    label: "Managers & engagement",
+    items: [
+      { s: "Manager Calibration", n: "Manager Calibration", d: "Flags “everything's fine” managers whose self-view is rosier than their team's data. Median gap in OWI points (≤5 green, ≤15 amber, >15 coral); manager-group only, never one named manager." },
+      { s: "Manager Cert Gap", n: "Manager Certification Gap", d: "Whether teams led by D30-certified managers score better on wellbeing than uncertified ones (in OWI points) — is the training paying off." },
+      { s: "Stress × Engagement", n: "Stress × Engagement Quadrant", d: "Plots each department by stress vs engagement into Thriving / Coasting / Straining / Burning." },
+      { s: "eNPS", n: "Employee Net Promoter Score", d: "How likely employees are to recommend the org as a place to work (−100 to +100)." },
+      { s: "Psych Safety", n: "Psychological Safety (Edmondson)", d: "How safe people feel to speak up, admit mistakes, and raise concerns (0–100)." },
+      { s: "IB", n: "Inclusion & Belonging", d: "How strongly employees feel they genuinely fit in and belong (0–100)." },
+    ],
+  },
+  {
+    label: "Care operations (the KCI scorecard)",
+    items: [
+      { s: "Help-Seeking Conversion", n: "Help-Seeking Conversion", d: "Of at-risk employees, the share who went on to engage with care." },
+      { s: "Help-Seeking Latency", n: "Help-Seeking Latency", d: "Median days from an at-risk flag to actually starting care (lower is better)." },
+      { s: "Crisis SLA", n: "Crisis SLA Adherence", d: "Share of crisis events resolved within the crisis-response time target." },
+      { s: "TTFS SLA", n: "Time-to-First-Session SLA", d: "Share of people who got their first session within the promised wait window." },
+      { s: "Episode Completion", n: "Episode Completion", d: "Of those who started therapy, the share who finished (completed / discharged / transferred). Target ≥60%." },
+      { s: "Recovery Rate", n: "Recovery Rate", d: "Of re-measured people in care, the share showing a reliable improvement." },
+    ],
+  },
+  {
+    label: "Candour & integrity — are the numbers honest?",
+    items: [
+      { s: "ORDI", n: "Observed–Reported Divergence Index", d: "The gap between what teams report (psychological safety) and how they actually behave (observed FieldLens signals)." },
+      { s: "Anonymity Delta", n: "Anonymity Delta", d: "Per-department gap between the named quarterly survey and the anonymous pulse; a big gap flags held-back candour." },
+      { s: "Conformity Delta", n: "Conformity Delta", d: "Flags a department whose answers came in unusually uniform, fast and synchronized — a fingerprint of pressured, manufactured consensus." },
+      { s: "Should-Would Gap", n: "Should-Would Gap", d: "How far a team's stated intent to stay and engage outruns its anonymous pulse (“says it, doesn't live it”)." },
+      { s: "SDX", n: "Safe Disclosure Index", d: "How safe employees feel disclosing distress or seeking help at work (0–100)." },
+      { s: "Opt-Out Trend", n: "Opt-Out Trend", d: "The share of assigned people declining to take part, tracked quarter-over-quarter." },
+    ],
+  },
+  {
+    label: "Risk & cost",
+    items: [
+      { s: "High Stress %", n: "High Perceived Stress (PSS-10)", d: "Share of a group scoring in the high-stress band of PSS-10." },
+      { s: "Presenteeism Cost", n: "Presenteeism Cost", d: "Estimated ₹/head lost each year to being at work but underperforming due to poor health." },
+      { s: "Attrition Risk", n: "Attrition Risk Signal", d: "A modeled quit-likelihood (OLBI + UWES + RET-1) that puts a ₹ value on retained staff; feeds ROI." },
+    ],
+  },
+  {
+    label: "Verify / Evidence / Govern — concepts, not metrics",
+    items: [
+      { s: "Proof engine", n: "Proof engine (Verify tab)", d: "Cost per verified improvement, and flags interventions whose measured impact has stalled or declined." },
+      { s: "Guardrail integrity", n: "Accelerator / brake pairs (anti-Goodhart)", d: "Flags when a “good news” metric rose while its paired safety counter-metric fell — a sign of gaming, not a real gain." },
+      { s: "Kill review", n: "Evidence kill-review", d: "A structured “keep or kill?” record: an advocate and an executioner argument → a verdict (Scale / Fix / Hold / Retire) on impact vs cost." },
+      { s: "Govern tracker", n: "Disclosure, certification & committee", d: "Turns published, privacy-safe numbers into an ESG disclosure sheet, a Silver/Gold certification scorecard, and a committee action tracker." },
+    ],
+  },
 ];
 
 const RQI_LAYERS = [
