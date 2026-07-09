@@ -78,6 +78,8 @@ export function HealthRiskTab({ filters }: { filters: DashboardFilters }) {
                 value={null}
                 pendingNote="MHSF-III not yet in the battery"
                 hint="flag if < 65"
+                glossary="MHSF-III · Mental Health Screening Form"
+                tooltip="Avg MHSF-III — mean of the Mental Health Screening Form (third revision), an aggregate-safe screen (0–100, higher is better); a cohort flags for review below 65."
               />
             </div>
             <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
@@ -87,6 +89,8 @@ export function HealthRiskTab({ filters }: { filters: DashboardFilters }) {
                 unit="%"
                 pendingNote="OBI p75/p90 after Wave-1 (B3)"
                 hint="OBI ≥ p75 share"
+                glossary="OBI · Oldenburg Burnout Inventory (OLBI)"
+                tooltip="High Burnout — the share of respondents whose OLBI (Oldenburg Burnout Inventory: exhaustion + disengagement) sits at or above the Wave-1 75th percentile. Formula: members ≥ p75 ÷ scored members × 100."
               />
             </div>
             <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
@@ -97,6 +101,8 @@ export function HealthRiskTab({ filters }: { filters: DashboardFilters }) {
                 pendingNote="needs PSS-10 in the battery"
                 hint="PSS ≥ 68 share"
                 alert={highStressBreached ? "above 20% threshold" : undefined}
+                glossary="PSS-10 · Perceived Stress Scale"
+                tooltip="High Stress — the share of respondents whose PSS-10 (Perceived Stress Scale, 10 items → 0–100) is in the high band (≥68, Cohen). Formula: high-band members ÷ scored members × 100."
               />
             </div>
             <div className="p-6">
@@ -106,6 +112,8 @@ export function HealthRiskTab({ filters }: { filters: DashboardFilters }) {
                 value={null}
                 pendingNote="BRS not yet in the battery"
                 hint="BRS (L2 + L3)"
+                glossary="BRS · Brief Resilience Scale"
+                tooltip="Avg Resilience — mean of the Brief Resilience Scale (BRS: ability to bounce back from stress), aggregated for L2 + L3 cohorts (k≥5). Pending until the BRS module is in the battery."
               />
             </div>
           </Panel>
@@ -216,6 +224,8 @@ function HeadlineStat({
   hint,
   pendingNote,
   alert,
+  glossary,
+  tooltip,
 }: {
   label: string;
   value: number | null;
@@ -223,6 +233,8 @@ function HeadlineStat({
   hint?: string;
   pendingNote?: string;
   alert?: string;
+  glossary?: string; // full form of the short form (bottom line)
+  tooltip?: string; // full explanation + formula, on hover
 }) {
   const pending = value === null;
   return (
@@ -246,9 +258,20 @@ function HeadlineStat({
           )}
         </>
       )}
-      {pending && hint && (
+      {(glossary || (pending && hint)) && (
         <div className="mt-auto pt-1">
-          <Foot>{hint}</Foot>
+          <Foot>
+            {glossary ? (
+              <span
+                title={tooltip}
+                className={tooltip ? "cursor-help border-b border-dotted border-slate-300" : undefined}
+              >
+                {glossary}
+              </span>
+            ) : (
+              hint
+            )}
+          </Foot>
         </div>
       )}
     </div>
