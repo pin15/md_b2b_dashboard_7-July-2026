@@ -24,6 +24,8 @@ interface MetricConfig {
   amber: number;
   max: number;
   hint: string;
+  full?: string; // full form of the short-form label
+  formula?: string; // the complete explanation + formula, shown on hover
 }
 
 function tone({ value, green, amber }: MetricConfig): Tone {
@@ -62,15 +64,22 @@ function formatDate(value?: string | null) {
 }
 
 function Metric({ config }: { config: MetricConfig }) {
-  const { label, value, unit, hint } = config;
+  const { label, value, unit, hint, full, formula } = config;
   const toneKey = tone(config);
   const color = toneColor(toneKey);
   const percent = fillPercent(config);
+  const tip = full && formula ? `${full} — ${formula}` : full || formula;
 
   return (
     <div className="flex min-w-[170px] flex-1 flex-col justify-between px-5 py-3 first:pl-0 last:pr-0">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-muted">
+        <span
+          title={tip}
+          className={
+            "text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-muted" +
+            (tip ? " cursor-help decoration-dotted underline-offset-2 hover:underline" : "")
+          }
+        >
           {label}
         </span>
 
@@ -144,6 +153,9 @@ export function DataConfidenceStrip({ period }: { period: string }) {
       amber: 60,
       max: 100,
       hint: "Participation × validity × representativeness",
+      full: "Data Confidence Score",
+      formula:
+        "geometric mean of participation, validity and representativeness (0–100). Below 60 the strip dims to “directional”.",
     },
     {
       label: "Response Validity",
@@ -153,6 +165,9 @@ export function DataConfidenceStrip({ period }: { period: string }) {
       amber: 80,
       max: 100,
       hint: "RQI-passing responses · target ≥90%",
+      full: "Response Validity Rate (RQI)",
+      formula:
+        "share of responses passing the RQI quality check — a response is excluded at ≥2 independent contradiction flags. Target ≥90%.",
     },
     {
       label: "Trust Quotient",
@@ -161,6 +176,9 @@ export function DataConfidenceStrip({ period }: { period: string }) {
       amber: 55,
       max: 100,
       hint: "Participation × validity × employee trust",
+      full: "Trust Quotient (TQ)",
+      formula:
+        "participation × validity × (1 − channel divergence) × trust-item × 100. Floor 60, target 70.",
     },
   ];
 
