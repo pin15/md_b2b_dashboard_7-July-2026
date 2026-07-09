@@ -385,14 +385,20 @@ const PIPELINE = [
 ];
 
 const TABS = [
-  { n: "Overview", d: "Headline wellbeing (OWI), by level, stress mix, coverage, roadmap, and trends." },
+  // The seven dashboard tabs, left → right.
+  { n: "Overview", d: "Headline wellbeing (OWI), by level, stress mix, coverage, roadmap, and quarter-over-quarter trends." },
   { n: "Health & Risk", d: "Vulnerability distribution + a department heatmap (participation / validity / trust)." },
-  { n: "Engagement", d: "Participation by department and level vs. the 70% target." },
-  { n: "Impact", d: "Programme ROI (self-reported) and outcome highlights." },
-  { n: "Participation", d: "The named roster: who completed vs. who hasn’t — status only." },
-  { n: "My Teams", d: "For managers: their own team’s direction + one finding + one play. k≥5." },
+  { n: "Engagement", d: "Completion by department and level against the 70% participation floor." },
+  { n: "Impact", d: "Programme ROI (self-reported) and the risk-vs-impact outcomes view." },
+  { n: "Verify", d: "How much to trust the signal — trust & candour, the proof engine, the outcomes ledger, and guardrail integrity." },
+  { n: "Act & Programmes", d: "Intervention recommendations + the delivery pipeline across care, people-development, and lifecycle support." },
+  { n: "Reports & Govern", d: "Disclosure & certification, the committee tracker, data & privacy, clinical quality, and brand / white-label." },
+  // The standalone screens in the sidebar.
+  { n: "Participation", d: "The named roster — who completed vs. who hasn’t, status only (never any answers)." },
+  { n: "Evidence", d: "The adversarial kill-review: advocate vs. executioner arguments and the impact P&L behind each metric." },
+  { n: "Health Report", d: "A one-click printable quarterly org-health summary (aggregate only)." },
+  { n: "My Teams", d: "For managers: their own team’s direction (a band, not a number) + one finding + one play, at k≥5." },
   { n: "Confidence strip", d: "Always on top: DCS · Validity · Trust." },
-  { n: "Org Health Report", d: "A one-click printable PDF summary (aggregate only)." },
 ];
 
 const ADVANTAGES = [
