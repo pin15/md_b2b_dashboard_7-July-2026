@@ -20,6 +20,7 @@ import {
 import { useThermocline } from "@/lib/northstar";
 import { useIsLeadership } from "@/lib/hooks/useViewerClaims";
 import { SEVERITY, gradientColor, owiBand } from "@/lib/severity";
+import { HintTip } from "@/components/ui/HintTip";
 import { cn } from "@/lib/utils";
 import type { DashboardFilters, MetricCell, MetricKey } from "@/lib/graphql/types";
 
@@ -260,18 +261,7 @@ function HeadlineStat({
       )}
       {(glossary || (pending && hint)) && (
         <div className="mt-auto pt-1">
-          <Foot>
-            {glossary ? (
-              <span
-                title={tooltip}
-                className={tooltip ? "cursor-help border-b border-dotted border-slate-300" : undefined}
-              >
-                {glossary}
-              </span>
-            ) : (
-              hint
-            )}
-          </Foot>
+          <Foot>{glossary ? <HintTip tip={tooltip}>{glossary}</HintTip> : hint}</Foot>
         </div>
       )}
     </div>

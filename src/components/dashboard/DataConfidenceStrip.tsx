@@ -2,6 +2,7 @@
 
 import { useDataConfidence } from "@/lib/hooks/useDashboardData";
 import { SEVERITY } from "@/lib/severity";
+import { HintTip } from "@/components/ui/HintTip";
 
 /**
  * Data Confidence strip.
@@ -73,14 +74,10 @@ function Metric({ config }: { config: MetricConfig }) {
   return (
     <div className="flex min-w-[170px] flex-1 flex-col justify-between px-5 py-3 first:pl-0 last:pr-0">
       <div className="flex items-center justify-between gap-3">
-        <span
-          title={tip}
-          className={
-            "text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-muted" +
-            (tip ? " cursor-help decoration-dotted underline-offset-2 hover:underline" : "")
-          }
-        >
-          {label}
+        <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-muted">
+          <HintTip tip={tip} placement="bottom">
+            {label}
+          </HintTip>
         </span>
 
         <span

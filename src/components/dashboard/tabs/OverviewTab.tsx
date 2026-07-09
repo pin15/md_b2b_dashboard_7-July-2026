@@ -34,6 +34,7 @@ import {
 } from "@/lib/hooks/useDashboardData";
 import { useEngagedCoveredLives } from "@/lib/northstar";
 import { SEVERITY, owiBand, stressBucketColor } from "@/lib/severity";
+import { HintTip } from "@/components/ui/HintTip";
 import { FreshnessStamp } from "@/components/dashboard/FreshnessStamp";
 import { ProjectRoadmap } from "@/components/dashboard/ProjectRoadmap";
 import type {
@@ -353,12 +354,9 @@ function OwiHero({ value, pendingNote }: { value: number | null; pendingNote: st
       </div>
       <div className="mt-auto pt-1">
         <Foot>
-          <span
-            title="OWI — Organisational Wellbeing Index: a 0–100 headline score blending WHO-5 (+), PSS-10 (−) and OLBI (−), weights renormalised. Bands: Green ≥70 · Amber 55–69 · Coral <55. Currently pending clinical sign-off."
-            className="cursor-help border-b border-dotted border-slate-300"
-          >
+          <HintTip tip="OWI — Organisational Wellbeing Index: a 0–100 headline score blending WHO-5 (+), PSS-10 (−) and OLBI (−), weights renormalised. Bands: Green ≥70 · Amber 55–69 · Coral <55. Currently pending clinical sign-off.">
             Green ≥ 70 · Amber 55–69 · Coral &lt; 55
-          </span>
+          </HintTip>
         </Foot>
       </div>
     </div>
@@ -412,12 +410,7 @@ function HeadlineStat({
       {glossary && (
         <div className="mt-auto pt-1">
           <Foot>
-            <span
-              title={tooltip}
-              className={tooltip ? "cursor-help border-b border-dotted border-slate-300" : undefined}
-            >
-              {glossary}
-            </span>
+            <HintTip tip={tooltip}>{glossary}</HintTip>
           </Foot>
         </div>
       )}
