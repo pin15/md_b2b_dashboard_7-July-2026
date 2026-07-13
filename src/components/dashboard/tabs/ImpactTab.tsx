@@ -23,6 +23,8 @@ import {
 import { SEVERITY } from "@/lib/severity";
 import { HintTip } from "@/components/ui/HintTip";
 import { GLOSSARY } from "@/lib/glossary";
+import { Gate } from "@/lib/hooks/useCapabilities";
+import { MotionQuadrant } from "../MotionQuadrant";
 import type { ReactNode } from "react";
 import type { DashboardFilters, OrgRoi, RoiTerm, DecisionCostRow } from "@/lib/graphql/types";
 
@@ -110,35 +112,47 @@ export function ImpactTab({ filters }: { filters: DashboardFilters }) {
               foot={<HintTip tip={GLOSSARY.Edmondson}>Edmondson exec 7-item</HintTip>}
             />
           </div>
-          <div className="p-6">
-            <OutcomeCell
-              label="Presenteeism cost"
-              value={
-                presenteeismCell && !presenteeismCell.suppressed && presenteeismCell.value != null
-                  ? inr(presenteeismCell.value)
-                  : null
-              }
-              suppressed={presenteeismCell?.suppressed}
-              pendingNote={<HintTip tip={GLOSSARY.WPAI}>WPAI-derived cost — accruing</HintTip>}
-              foot={
-                <HintTip tip={GLOSSARY["WPAI-GH"]}>annualised presenteeism ₹ (WPAI-GH)</HintTip>
-              }
-            />
-          </div>
+          <Gate cap="metric:PRESENTEEISM_COST">
+            <div className="p-6">
+              <OutcomeCell
+                label="Presenteeism cost"
+                value={
+                  presenteeismCell && !presenteeismCell.suppressed && presenteeismCell.value != null
+                    ? inr(presenteeismCell.value)
+                    : null
+                }
+                suppressed={presenteeismCell?.suppressed}
+                pendingNote={<HintTip tip={GLOSSARY.WPAI}>WPAI-derived cost — accruing</HintTip>}
+                foot={
+                  <HintTip tip={GLOSSARY["WPAI-GH"]}>annualised presenteeism ₹ (WPAI-GH)</HintTip>
+                }
+              />
+            </div>
+          </Gate>
         </Panel>
       </section>
 
       {/* ── Programme ROI (doc 11) ───────────────────────────────────────── */}
-      <section className="space-y-3">
-        <SectionHeader title="Programme ROI" meta="baseline → current · org-grain" />
-        {roi.isLoading ? <PanelSkeleton /> : <RoiPanel roi={roi.data} />}
-      </section>
+      <Gate cap="metric:roi_multiple">
+        <section className="space-y-3">
+          <SectionHeader title="Programme ROI" meta="baseline → current · org-grain" />
+          {roi.isLoading ? <PanelSkeleton /> : <RoiPanel roi={roi.data} />}
+        </section>
+      </Gate>
 
       {/* ── WS-O O3 — Help-Seeking latency + conversion ("months → weeks") ── */}
       <section className="space-y-3">
         <SectionHeader title="Help-seeking — flag to care" meta="paired guardrails · k≥5" />
         <HelpSeekingSection period={filters.period} />
       </section>
+
+      {/* ── Stress × Engagement motion quadrant (SLI_EI_QUADRANT) ──────────── */}
+      <Gate cap="metric:SLI_EI_QUADRANT">
+        <section className="space-y-3">
+          <SectionHeader title="Stress × engagement" meta="by department · k≥5" />
+          <MotionQuadrant period={filters.period} />
+        </section>
+      </Gate>
 
       {/* ── G4 — Org Rating + Recovery Yield + Decision Cost, tier-gated ──── */}
       <RiskImpactSections period={filters.period} />
@@ -325,24 +339,28 @@ function HelpSeekingSection({ period }: { period: string }) {
   return (
     <Panel className="overflow-hidden">
       <div className="grid sm:grid-cols-2">
-        <div className="border-b border-slate-100 p-6 sm:border-b-0 sm:border-r">
-          <HelpSeekingStat
-            label="Time to care"
-            unit="days"
-            cell={lat}
-            toneOf={latencyTone}
-            empty="needs flag→care data"
-          />
-        </div>
-        <div className="p-6">
-          <HelpSeekingStat
-            label="Conversion"
-            unit="%"
-            cell={conv}
-            toneOf={convTone}
-            empty="needs flag→care data"
-          />
-        </div>
+        <Gate cap="metric:HELP_SEEKING_LATENCY">
+          <div className="border-b border-slate-100 p-6 sm:border-b-0 sm:border-r">
+            <HelpSeekingStat
+              label="Time to care"
+              unit="days"
+              cell={lat}
+              toneOf={latencyTone}
+              empty="needs flag→care data"
+            />
+          </div>
+        </Gate>
+        <Gate cap="metric:HELP_SEEKING_CONVERSION">
+          <div className="p-6">
+            <HelpSeekingStat
+              label="Conversion"
+              unit="%"
+              cell={conv}
+              toneOf={convTone}
+              empty="needs flag→care data"
+            />
+          </div>
+        </Gate>
       </div>
       <div className="border-t border-slate-100 px-6 py-3.5">
         <Foot>

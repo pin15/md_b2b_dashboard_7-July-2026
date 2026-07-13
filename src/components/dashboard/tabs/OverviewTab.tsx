@@ -33,6 +33,7 @@ import {
   useOrgQuadrant,
 } from "@/lib/hooks/useDashboardData";
 import { useEngagedCoveredLives } from "@/lib/northstar";
+import { Gate } from "@/lib/hooks/useCapabilities";
 import { SEVERITY, owiBand, stressBucketColor } from "@/lib/severity";
 import { HintTip } from "@/components/ui/HintTip";
 import { FreshnessStamp } from "@/components/dashboard/FreshnessStamp";
@@ -124,7 +125,9 @@ export function OverviewTab({ filters }: { filters: DashboardFilters }) {
         <SectionHeader title="This quarter" meta={<FreshnessStamp freshness={data.freshness} />} />
         <Panel className="grid md:grid-cols-4">
           <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-            <OwiHero value={kpis.wellnessScore} pendingNote="OWI weighting sign-off" />
+            <Gate cap="module:wellbeing">
+              <OwiHero value={kpis.wellnessScore} pendingNote="OWI weighting sign-off" />
+            </Gate>
           </div>
           <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
             <HeadlineStat
@@ -231,7 +234,9 @@ export function OverviewTab({ filters }: { filters: DashboardFilters }) {
         <SectionHeader title="Trajectory" meta="org-grain · k≥5 · suppressed points are gaps" />
         <Panel className="grid lg:grid-cols-2">
           <div className="border-b border-slate-100 p-6 lg:border-b-0 lg:border-r">
-            <TrendsCell />
+            <Gate cap="module:confidence">
+              <TrendsCell />
+            </Gate>
           </div>
           <div className="p-6">
             <QuadrantCell period={filters.period} />

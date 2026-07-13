@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { Gate } from "@/lib/hooks/useCapabilities";
 import {
   Panel,
   SectionHeader,
@@ -73,36 +74,46 @@ export function VerifyTab({ filters }: { filters: DashboardFilters }) {
       </header>
 
       {/* ── WS-O O0/O6 — anti-Goodhart guardrail-violation strip ─────────── */}
-      <GuardrailSection period={filters.period} />
+      <Gate cap="module:guardrail">
+        <GuardrailSection period={filters.period} />
+      </Gate>
 
       {/* ── G3 trust/divergence beat — reported climate vs reality ───────── */}
       <section className="space-y-3">
         <SectionHeader title="Trust & candour" meta="k≥5 aggregates · never an individual" />
         <Panel className="grid md:grid-cols-3">
           <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-            <ChannelDivergenceCell period={filters.period} />
+            <Gate cap="metric:CHANNEL_DIVERGENCE_INDEX">
+              <ChannelDivergenceCell period={filters.period} />
+            </Gate>
           </div>
           <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-            <OrdiCell />
+            <Gate cap="metric:ORDI">
+              <OrdiCell />
+            </Gate>
           </div>
           <div className="p-6">
-            <FieldLensCell period={filters.period} />
+            <Gate cap="module:candour">
+              <FieldLensCell period={filters.period} />
+            </Gate>
           </div>
         </Panel>
       </section>
 
       {/* ── b2b_283 — proof engine: cost-per-outcome + retire signal ─────── */}
-      <section className="space-y-3">
-        <SectionHeader title="Proof engine" meta="proof, not promises" />
-        <Panel className="grid md:grid-cols-2">
-          <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-            <CostPerOutcomeCell period={filters.period} />
-          </div>
-          <div className="p-6">
-            <RetireSignalCell />
-          </div>
-        </Panel>
-      </section>
+      <Gate cap="module:proof">
+        <section className="space-y-3">
+          <SectionHeader title="Proof engine" meta="proof, not promises" />
+          <Panel className="grid md:grid-cols-2">
+            <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
+              <CostPerOutcomeCell period={filters.period} />
+            </div>
+            <div className="p-6">
+              <RetireSignalCell />
+            </div>
+          </Panel>
+        </section>
+      </Gate>
 
       {/* ── Outcomes ledger — did it hold? ────────────────────────────────── */}
       <section className="space-y-3">

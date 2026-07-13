@@ -22,6 +22,7 @@ import { useIsLeadership } from "@/lib/hooks/useViewerClaims";
 import { SEVERITY, gradientColor, owiBand } from "@/lib/severity";
 import { HintTip } from "@/components/ui/HintTip";
 import { cn } from "@/lib/utils";
+import { Gate } from "@/lib/hooks/useCapabilities";
 import type { DashboardFilters, MetricCell, MetricKey } from "@/lib/graphql/types";
 
 /**
@@ -83,52 +84,60 @@ export function HealthRiskTab({ filters }: { filters: DashboardFilters }) {
                 tooltip="Avg MHSF-III — mean of the Mental Health Screening Form (third revision), an aggregate-safe screen (0–100, higher is better); a cohort flags for review below 65."
               />
             </div>
-            <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-              <HeadlineStat
-                label="High burnout"
-                value={kpis?.burnoutRiskPct ?? null}
-                unit="%"
-                pendingNote="OBI p75/p90 after Wave-1 (B3)"
-                hint="OBI ≥ p75 share"
-                glossary="OBI · Oldenburg Burnout Inventory (OLBI)"
-                tooltip="High Burnout — the share of respondents whose OLBI (Oldenburg Burnout Inventory: exhaustion + disengagement) sits at or above the Wave-1 75th percentile. Formula: members ≥ p75 ÷ scored members × 100."
-              />
-            </div>
-            <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-              <HeadlineStat
-                label="High stress"
-                value={highStress}
-                unit="%"
-                pendingNote="needs PSS-10 in the battery"
-                hint="PSS ≥ 68 share"
-                alert={highStressBreached ? "above 20% threshold" : undefined}
-                glossary="PSS-10 · Perceived Stress Scale"
-                tooltip="High Stress — the share of respondents whose PSS-10 (Perceived Stress Scale, 10 items → 0–100) is in the high band (≥68, Cohen). Formula: high-band members ÷ scored members × 100."
-              />
-            </div>
-            <div className="p-6">
-              {/* Resilience (BRS) is not yet seeded/aggregated — pending, never invented. */}
-              <HeadlineStat
-                label="Avg resilience"
-                value={null}
-                pendingNote="BRS not yet in the battery"
-                hint="BRS (L2 + L3)"
-                glossary="BRS · Brief Resilience Scale"
-                tooltip="Avg Resilience — mean of the Brief Resilience Scale (BRS: ability to bounce back from stress), aggregated for L2 + L3 cohorts (k≥5). Pending until the BRS module is in the battery."
-              />
-            </div>
+            <Gate cap="metric:OBI_HIGH_PCT">
+              <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
+                <HeadlineStat
+                  label="High burnout"
+                  value={kpis?.burnoutRiskPct ?? null}
+                  unit="%"
+                  pendingNote="OBI p75/p90 after Wave-1 (B3)"
+                  hint="OBI ≥ p75 share"
+                  glossary="OBI · Oldenburg Burnout Inventory (OLBI)"
+                  tooltip="High Burnout — the share of respondents whose OLBI (Oldenburg Burnout Inventory: exhaustion + disengagement) sits at or above the Wave-1 75th percentile. Formula: members ≥ p75 ÷ scored members × 100."
+                />
+              </div>
+            </Gate>
+            <Gate cap="metric:PSS_HIGH_PCT">
+              <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
+                <HeadlineStat
+                  label="High stress"
+                  value={highStress}
+                  unit="%"
+                  pendingNote="needs PSS-10 in the battery"
+                  hint="PSS ≥ 68 share"
+                  alert={highStressBreached ? "above 20% threshold" : undefined}
+                  glossary="PSS-10 · Perceived Stress Scale"
+                  tooltip="High Stress — the share of respondents whose PSS-10 (Perceived Stress Scale, 10 items → 0–100) is in the high band (≥68, Cohen). Formula: high-band members ÷ scored members × 100."
+                />
+              </div>
+            </Gate>
+            <Gate cap="metric:BRS">
+              <div className="p-6">
+                {/* Resilience (BRS) is not yet seeded/aggregated — pending, never invented. */}
+                <HeadlineStat
+                  label="Avg resilience"
+                  value={null}
+                  pendingNote="BRS not yet in the battery"
+                  hint="BRS (L2 + L3)"
+                  glossary="BRS · Brief Resilience Scale"
+                  tooltip="Avg Resilience — mean of the Brief Resilience Scale (BRS: ability to bounce back from stress), aggregated for L2 + L3 cohorts (k≥5). Pending until the BRS module is in the battery."
+                />
+              </div>
+            </Gate>
           </Panel>
         )}
       </section>
 
       {/* ── Vulnerability distribution (VDI) ───────────────────────────────── */}
-      <section className="space-y-3">
-        <SectionHeader
-          title="Vulnerability distribution"
-          meta="% of cohort per clinical band · calm gradient"
-        />
-        {vdi.isLoading ? <PanelSkeleton /> : <VdiPanel cells={vdi.data ?? []} />}
-      </section>
+      <Gate cap="metric:VDI">
+        <section className="space-y-3">
+          <SectionHeader
+            title="Vulnerability distribution"
+            meta="% of cohort per clinical band · calm gradient"
+          />
+          {vdi.isLoading ? <PanelSkeleton /> : <VdiPanel cells={vdi.data ?? []} />}
+        </section>
+      </Gate>
 
       {/* ── Department signal — participation / validity / trust ledger ────── */}
       <section className="space-y-3">
@@ -168,14 +177,18 @@ export function HealthRiskTab({ filters }: { filters: DashboardFilters }) {
                 l1→l2→l3 before it attenuates. Aggregate-only (k≥5). */}
             <ThermoclineCell period={filters.period} />
           </div>
-          <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-            {/* WS-O O2 — Manager Calibration (KRI, l3_only; gated to leadership). */}
-            <ManagerCalibrationCell period={filters.period} />
-          </div>
-          <div className="p-6">
-            {/* WS-U U5 — certified-vs-uncertified manager wellbeing gap (l3-only, b2b_281). */}
-            <ManagerCertGapCell period={filters.period} />
-          </div>
+          <Gate cap="metric:MANAGER_CALIBRATION">
+            <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
+              {/* WS-O O2 — Manager Calibration (KRI, l3_only; gated to leadership). */}
+              <ManagerCalibrationCell period={filters.period} />
+            </div>
+          </Gate>
+          <Gate cap="metric:MANAGER_CERT_GAP">
+            <div className="p-6">
+              {/* WS-U U5 — certified-vs-uncertified manager wellbeing gap (l3-only, b2b_281). */}
+              <ManagerCertGapCell period={filters.period} />
+            </div>
+          </Gate>
         </Panel>
       </section>
 
@@ -183,18 +196,31 @@ export function HealthRiskTab({ filters }: { filters: DashboardFilters }) {
       <section className="space-y-3">
         <SectionHeader title="Dynamic signals" meta="governed metrics · honest-or-pending" />
         <Panel className="grid md:grid-cols-2 lg:grid-cols-4">
-          <div className="border-b border-slate-100 p-6 md:border-r lg:border-b-0">
-            <SleepIndexCell period={filters.period} />
-          </div>
-          <div className="border-b border-slate-100 p-6 lg:border-b-0 lg:border-r">
-            <RecoveryHalfLifeCell period={filters.period} />
-          </div>
-          <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-            <PulseVolatilityCell period={filters.period} />
-          </div>
-          <div className="p-6">
-            <MoodCastCell period={filters.period} />
-          </div>
+          <Gate cap="metric:SLEEP_INDEX">
+            <div className="border-b border-slate-100 p-6 md:border-r lg:border-b-0">
+              <SleepIndexCell period={filters.period} />
+            </div>
+          </Gate>
+          <Gate cap="metric:RECOVERY_HALF_LIFE">
+            <div className="border-b border-slate-100 p-6 lg:border-b-0 lg:border-r">
+              <RecoveryHalfLifeCell period={filters.period} />
+            </div>
+          </Gate>
+          <Gate cap="metric:PULSE_VOLATILITY">
+            <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
+              <PulseVolatilityCell period={filters.period} />
+            </div>
+          </Gate>
+          <Gate cap="metric:MOODCAST">
+            <div className="p-6">
+              <MoodCastCell period={filters.period} />
+            </div>
+          </Gate>
+          <Gate cap="metric:HEALTHY_STEP_DOWN_RATE">
+            <div className="border-t border-slate-100 p-6 md:border-r lg:border-t lg:border-r-0 lg:[grid-column:1]">
+              <HealthyStepDownCell period={filters.period} />
+            </div>
+          </Gate>
         </Panel>
       </section>
 
@@ -958,6 +984,56 @@ function MoodCastCell({ period }: { period: string }) {
         <Foot>
           Next quarter&apos;s Organisational Wellbeing Index, projected from the published
           trend. Honest-or-null: wide/withheld when history is thin. Aggregate only, k≥5.
+        </Foot>
+      </div>
+    </div>
+  );
+}
+
+/* Healthy Step-Down Rate (b2b_350 registry metric — no prior UI). Share of cohort
+   members who de-escalate from a high-stress reading back to a healthy band across
+   consecutive periods. Higher = more of the workforce recovers on its own. */
+
+// healthy_step_down_rate_band: %, higher=better. green ≥60 / amber ≥35 / coral <35.
+function stepDownTone(v: number): string {
+  if (v >= 60) return SEVERITY.green;
+  if (v >= 35) return SEVERITY.amber;
+  return SEVERITY.coral;
+}
+
+function HealthyStepDownCell({ period }: { period: string }) {
+  const org = useMetricCells("HEALTHY_STEP_DOWN_RATE", "ORG", period);
+  if (org.isLoading) return <CellSkeleton />;
+  if (org.isError)
+    return (
+      <p className="text-[13px]" style={{ color: SEVERITY.red }}>
+        Could not load the step-down rate — refresh to retry.
+      </p>
+    );
+
+  const cell = org.data?.[0];
+  const suppressed = !cell || cell.suppressed || cell.value == null;
+  const v = cell?.value ?? null;
+
+  return (
+    <div className="flex h-full flex-col gap-3">
+      <CellTitle>Healthy step-down rate</CellTitle>
+      {suppressed || v == null ? (
+        <p className="text-[13px] leading-relaxed text-slate-400">
+          Pending — appears once ≥2 consecutive periods of pulse data exist to trace a
+          high-stress → healthy transition.
+        </p>
+      ) : (
+        <MicroStat
+          label="De-escalated on their own"
+          value={<span style={{ color: stepDownTone(v) }}>{v}%</span>}
+          hint={`n=${cell!.n}${cell!.lowConfidence ? " · low confidence" : ""}`}
+        />
+      )}
+      <div className="mt-auto pt-1">
+        <Foot>
+          Share of a high-stress cohort that returns to a healthy band the following period.
+          Aggregate only, k≥5. thriving ≥60%.
         </Foot>
       </div>
     </div>

@@ -14,6 +14,7 @@ import {
 import { useMetricCells, useOrgFamilyCoverage } from "@/lib/hooks/useDashboardData";
 import { SEVERITY, gradientColor } from "@/lib/severity";
 import { HintTip } from "@/components/ui/HintTip";
+import { Gate } from "@/lib/hooks/useCapabilities";
 import { GLOSSARY } from "@/lib/glossary";
 import type { ReactNode } from "react";
 import type { DashboardFilters, MetricCell } from "@/lib/graphql/types";
@@ -71,61 +72,65 @@ export function EngagementTab({ filters }: { filters: DashboardFilters }) {
       {/* ── This campaign — participation headline band ─────────────────── */}
       <section className="space-y-3">
         <SectionHeader title="This campaign" meta={filters.period} />
-        {loading ? (
-          <PanelSkeleton />
-        ) : (
-          <Panel className="grid md:grid-cols-4">
-            <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-              <ParticipationHero cell={orgCell} />
-            </div>
-            <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-              <CampaignStat
-                label="Depts at / above target"
-                value={dept ? dept.atTarget : null}
-                hint={dept ? `of ${dept.shown} shown` : undefined}
-              />
-            </div>
-            <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-              <CampaignStat
-                label="Cohorts below threshold"
-                value={dept ? dept.suppressed : null}
-                hint="n<5 — suppressed"
-              />
-            </div>
-            <div className="p-6">
-              <CampaignStat
-                label="Responding employees"
-                value={orgCell && !orgCell.suppressed ? orgCell.n : null}
-                hint="this campaign"
-              />
-            </div>
-          </Panel>
-        )}
+        <Gate cap="metric:PARTICIPATION_PCT">
+          {loading ? (
+            <PanelSkeleton />
+          ) : (
+            <Panel className="grid md:grid-cols-4">
+              <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
+                <ParticipationHero cell={orgCell} />
+              </div>
+              <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
+                <CampaignStat
+                  label="Depts at / above target"
+                  value={dept ? dept.atTarget : null}
+                  hint={dept ? `of ${dept.shown} shown` : undefined}
+                />
+              </div>
+              <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
+                <CampaignStat
+                  label="Cohorts below threshold"
+                  value={dept ? dept.suppressed : null}
+                  hint="n<5 — suppressed"
+                />
+              </div>
+              <div className="p-6">
+                <CampaignStat
+                  label="Responding employees"
+                  value={orgCell && !orgCell.suppressed ? orgCell.n : null}
+                  hint="this campaign"
+                />
+              </div>
+            </Panel>
+          )}
+        </Gate>
       </section>
 
       {/* ── Completion by cohort ─────────────────────────────────────────── */}
       <section className="space-y-3">
         <SectionHeader title="Completion by cohort" meta="completed ÷ assigned · k≥5" />
-        {loading ? (
-          <PanelSkeleton />
-        ) : (
-          <Panel className="grid md:grid-cols-2">
-            <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-              <CohortCell
-                title="By department"
-                cells={byDept.data ?? []}
-                foot="Completion per department. Cells with fewer than 5 assigned stay suppressed."
-              />
-            </div>
-            <div className="p-6">
-              <CohortCell
-                title="By level"
-                cells={byLevel.data ?? []}
-                foot="L1 / L2 / L3 seniority bands. Cells with fewer than 5 assigned stay suppressed."
-              />
-            </div>
-          </Panel>
-        )}
+        <Gate cap="metric:PARTICIPATION_PCT">
+          {loading ? (
+            <PanelSkeleton />
+          ) : (
+            <Panel className="grid md:grid-cols-2">
+              <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
+                <CohortCell
+                  title="By department"
+                  cells={byDept.data ?? []}
+                  foot="Completion per department. Cells with fewer than 5 assigned stay suppressed."
+                />
+              </div>
+              <div className="p-6">
+                <CohortCell
+                  title="By level"
+                  cells={byLevel.data ?? []}
+                  foot="L1 / L2 / L3 seniority bands. Cells with fewer than 5 assigned stay suppressed."
+                />
+              </div>
+            </Panel>
+          )}
+        </Gate>
       </section>
 
       {/* ── Engagement signals (org-grain, k≥5). Honest-pending when a cell
@@ -155,14 +160,16 @@ export function EngagementTab({ filters }: { filters: DashboardFilters }) {
                 hint="share of help-seeking that led to action"
               />
             </div>
-            <div className="p-6">
-              <SignalCell
-                label="Opt-out trend"
-                cell={optOutCell}
-                unit="%"
-                hint="consent opt-outs this period"
-              />
-            </div>
+            <Gate cap="metric:OPT_OUT_TREND">
+              <div className="p-6">
+                <SignalCell
+                  label="Opt-out trend"
+                  cell={optOutCell}
+                  unit="%"
+                  hint="consent opt-outs this period"
+                />
+              </div>
+            </Gate>
           </Panel>
         )}
       </section>
@@ -171,9 +178,11 @@ export function EngagementTab({ filters }: { filters: DashboardFilters }) {
       <section className="space-y-3">
         <SectionHeader title="Care & coverage" />
         <Panel className="grid md:grid-cols-2">
-          <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-            <StepDownCell period={filters.period} />
-          </div>
+          <Gate cap="metric:HEALTHY_STEP_DOWN_RATE">
+            <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
+              <StepDownCell period={filters.period} />
+            </div>
+          </Gate>
           <div className="p-6">
             <FamilyCoverageCell />
           </div>

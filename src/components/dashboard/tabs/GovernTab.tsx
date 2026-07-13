@@ -24,6 +24,7 @@ import {
 import { SEVERITY } from "@/lib/severity";
 import { HintTip } from "@/components/ui/HintTip";
 import { GLOSSARY } from "@/lib/glossary";
+import { Gate } from "@/lib/hooks/useCapabilities";
 import type {
   DashboardFilters,
   EsgDisclosureLine,
@@ -77,52 +78,62 @@ export function GovernTab({ filters }: { filters: DashboardFilters }) {
       </header>
 
       {/* ── Clinical quality (WS-O O4 — KCI scorecard) ───────────────────── */}
-      <section className="space-y-3">
-        <ClinicalQualitySection period={filters.period} />
-      </section>
+      <Gate cap="module:care">
+        <section className="space-y-3">
+          <ClinicalQualitySection period={filters.period} />
+        </section>
+      </Gate>
 
       {/* ── Disclosure & certification ──────────────────────────────────── */}
-      <section className="space-y-3">
-        <SectionHeader title="Disclosure & certification" meta={filters.period} />
-        <Panel className="grid lg:grid-cols-2">
-          <div className="border-b border-slate-100 p-6 lg:border-b-0 lg:border-r">
-            <EsgCell rows={esg.data ?? []} loading={esg.isLoading} period={filters.period} />
-          </div>
-          <div className="p-6">
-            <CertificationCell rows={cert.data ?? []} loading={cert.isLoading} />
-          </div>
-        </Panel>
-      </section>
+      <Gate cap="module:esg">
+        <section className="space-y-3">
+          <SectionHeader title="Disclosure & certification" meta={filters.period} />
+          <Panel className="grid lg:grid-cols-2">
+            <div className="border-b border-slate-100 p-6 lg:border-b-0 lg:border-r">
+              <EsgCell rows={esg.data ?? []} loading={esg.isLoading} period={filters.period} />
+            </div>
+            <div className="p-6">
+              <CertificationCell rows={cert.data ?? []} loading={cert.isLoading} />
+            </div>
+          </Panel>
+        </section>
+      </Gate>
 
       {/* ── Committee tracker ───────────────────────────────────────────── */}
-      <section className="space-y-3">
-        <SectionHeader
-          title="Committee tracker"
-          meta={
-            committeeKpi
-              ? `closure ${committeeKpi.closureRate == null ? "—" : `${committeeKpi.closureRate}%`} · ${committeeKpi.closedCount ?? 0}/${committeeKpi.totalCount ?? 0} tracked`
-              : undefined
-          }
-        />
-        {committee.isLoading ? (
-          <PanelSkeleton />
-        ) : (
-          <CommitteeLedger rows={committeeRows.filter((r) => r.catalogueKey !== "_KPI")} />
-        )}
-      </section>
+      <Gate cap="module:esg">
+        <section className="space-y-3">
+          <SectionHeader
+            title="Committee tracker"
+            meta={
+              committeeKpi
+                ? `closure ${committeeKpi.closureRate == null ? "—" : `${committeeKpi.closureRate}%`} · ${committeeKpi.closedCount ?? 0}/${committeeKpi.totalCount ?? 0} tracked`
+                : undefined
+            }
+          />
+          {committee.isLoading ? (
+            <PanelSkeleton />
+          ) : (
+            <CommitteeLedger rows={committeeRows.filter((r) => r.catalogueKey !== "_KPI")} />
+          )}
+        </section>
+      </Gate>
 
       {/* ── Data & privacy ──────────────────────────────────────────────── */}
-      <section className="space-y-3">
-        <SectionHeader title="Data & privacy" meta="never-list · rule of five · suppression KRI" />
-        {kri.isLoading || !kri.data ? <PanelSkeleton /> : <PrivacyPanel kri={kri.data} />}
-      </section>
+      <Gate cap="module:privacy">
+        <section className="space-y-3">
+          <SectionHeader title="Data & privacy" meta="never-list · rule of five · suppression KRI" />
+          {kri.isLoading || !kri.data ? <PanelSkeleton /> : <PrivacyPanel kri={kri.data} />}
+        </section>
+      </Gate>
 
       {/* ── Brand & white-label (b2b_282) — a settings surface, kept apart
              from the accountability sections above. ─────────────────────── */}
-      <section className="space-y-3">
-        <SectionHeader title="Brand & white-label" meta="managed in admin · read-only here" />
-        <BrandPanel />
-      </section>
+      <Gate cap="module:brand">
+        <section className="space-y-3">
+          <SectionHeader title="Brand & white-label" meta="managed in admin · read-only here" />
+          <BrandPanel />
+        </section>
+      </Gate>
 
       {/* ── Notes colophon (honest scaffolding) ─────────────────────────── */}
       <footer className="space-y-2 border-t border-slate-200/70 px-1 pt-5">

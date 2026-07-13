@@ -34,6 +34,7 @@ import {
 import { SEVERITY, gradientColor } from "@/lib/severity";
 import { HintTip } from "@/components/ui/HintTip";
 import { GLOSSARY } from "@/lib/glossary";
+import { Gate } from "@/lib/hooks/useCapabilities";
 import { Check, ChevronDown } from "lucide-react";
 import type {
   DashboardFilters,
@@ -96,25 +97,27 @@ export function ActTab({ filters }: { filters: DashboardFilters }) {
 
       {/* ── Recommendations — precision ledger ─────────────────────────── */}
       <section className="space-y-3">
-        <SectionHeader
-          title="Recommendations"
-          meta={recRows.length > 0 ? `${recRows.length} off target · ${filters.period}` : undefined}
-        />
-        {recs.isLoading ? (
-          <PanelSkeleton />
-        ) : recRows.length === 0 ? (
-          <Panel className="px-6 py-10 text-center">
-            <p className="text-[13.5px] font-medium text-slate-900">
-              Nothing is off-target this quarter
-            </p>
-            <p className="mx-auto mt-1 max-w-md text-[12.5px] leading-relaxed text-slate-400">
-              A recommendation appears only when a published metric reads off its target at k≥5.
-              Until then there is no programme to suggest — no fabricated nudge.
-            </p>
-          </Panel>
-        ) : (
-          <RecommendationLedger rows={recRows} period={filters.period} />
-        )}
+        <Gate cap="module:recommendations">
+          <SectionHeader
+            title="Recommendations"
+            meta={recRows.length > 0 ? `${recRows.length} off target · ${filters.period}` : undefined}
+          />
+          {recs.isLoading ? (
+            <PanelSkeleton />
+          ) : recRows.length === 0 ? (
+            <Panel className="px-6 py-10 text-center">
+              <p className="text-[13.5px] font-medium text-slate-900">
+                Nothing is off-target this quarter
+              </p>
+              <p className="mx-auto mt-1 max-w-md text-[12.5px] leading-relaxed text-slate-400">
+                A recommendation appears only when a published metric reads off its target at k≥5.
+                Until then there is no programme to suggest — no fabricated nudge.
+              </p>
+            </Panel>
+          ) : (
+            <RecommendationLedger rows={recRows} period={filters.period} />
+          )}
+        </Gate>
       </section>
 
       {/* ── Delivery pipeline ───────────────────────────────────────────── */}
@@ -137,12 +140,16 @@ export function ActTab({ filters }: { filters: DashboardFilters }) {
           <div className="border-b border-slate-100 p-6 md:border-r">
             <SelfcareCell period={filters.period} />
           </div>
-          <div className="border-b border-slate-100 p-6">
-            <CoachingCell period={filters.period} />
-          </div>
-          <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-            <WorkshopsCell period={filters.period} />
-          </div>
+          <Gate cap="module:programmes">
+            <div className="border-b border-slate-100 p-6">
+              <CoachingCell period={filters.period} />
+            </div>
+          </Gate>
+          <Gate cap="module:programmes">
+            <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
+              <WorkshopsCell period={filters.period} />
+            </div>
+          </Gate>
           <div className="p-6">
             <MhfaCell />
           </div>
@@ -153,12 +160,16 @@ export function ActTab({ filters }: { filters: DashboardFilters }) {
       <section className="space-y-3">
         <SectionHeader title="People development" />
         <Panel className="grid md:grid-cols-3">
-          <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-            <AcademyCell period={filters.period} />
-          </div>
-          <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-            <CertificationCell />
-          </div>
+          <Gate cap="module:programmes">
+            <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
+              <AcademyCell period={filters.period} />
+            </div>
+          </Gate>
+          <Gate cap="module:programmes">
+            <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
+              <CertificationCell />
+            </div>
+          </Gate>
           <div className="p-6">
             <ObservedClimateCell />
           </div>
@@ -167,15 +178,17 @@ export function ActTab({ filters }: { filters: DashboardFilters }) {
 
       {/* ── Lifecycle support (KEYSTONE privacy contract) ───────────────── */}
       <section className="space-y-3">
-        <SectionHeader title="Lifecycle support" meta="offers only — uptake invisible by construction" />
-        <Panel className="grid md:grid-cols-2">
-          <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
-            <LifeMomentsCell />
-          </div>
-          <div className="p-6">
-            <BridgesCell />
-          </div>
-        </Panel>
+        <Gate cap="module:lifecycle">
+          <SectionHeader title="Lifecycle support" meta="offers only — uptake invisible by construction" />
+          <Panel className="grid md:grid-cols-2">
+            <div className="border-b border-slate-100 p-6 md:border-b-0 md:border-r">
+              <LifeMomentsCell />
+            </div>
+            <div className="p-6">
+              <BridgesCell />
+            </div>
+          </Panel>
+        </Gate>
       </section>
 
       {/* ── Critical incidents ──────────────────────────────────────────── */}
